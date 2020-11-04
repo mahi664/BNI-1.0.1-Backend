@@ -1,0 +1,6 @@
+Test category name 1,Test category display name 1,Test category description 1
+Test category name 2,Test category display name 2,Test category description 2
+Test category name 3,Test category display name 3,Test category description 3
+Test category name 4,Test category display name 4,Test category description 4
+Test category name 5,Test category display name 5,Test category description 5
+Test category name 6,Test category display name 6,Test category description 6

@@ -1,0 +1,12 @@
+Test Product 1,Test Product Display Name 1,Test product description 1,Test category name 1,5,5,,,Nos
+Test Product 2,Test Product Display Name 2,Test product description 2,Test category name 2,12,12,,,Packet
+Test Product 3,Test Product Display Name 3,Test product description 3,Test category name 3,18,18,,,Nos
+Test Product 4,Test Product Display Name 4,Test product description 4,Test category name 4,12,12,,,Packet
+Test Product 5,Test Product Display Name 5,Test product description 5,Test category name 5,5,5,,,Nos
+Test Product 6,Test Product Display Name 6,Test product description 6,Test category name 6,18,18,,,Packet
+Test Product 11,Test Product Display Name 11,Test product description 11,Test category name 1,5,5,,,Nos
+Test Product 21,Test Product Display Name 21,Test product description 21,Test category name 2,12,12,,,Packet
+Test Product 31,Test Product Display Name 31,Test product description 31,Test category name 3,18,18,,,Nos
+Test Product 41,Test Product Display Name 41,Test product description 41,Test category name 4,12,12,,,Packet
+Test Product 51,Test Product Display Name 51,Test product description 51,Test category name 5,5,5,,,Nos
+Test Product 61,Test Product Display Name 61,Test product description 61,Test category name 6,18,18,,,Packet

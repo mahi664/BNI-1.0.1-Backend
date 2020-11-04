@@ -1,0 +1,79 @@
+1.http://localhost:8080/add-new-category : POST call
+{
+	"categoryName" : "Test category name 0",
+	"categoryDispName" : "Test category display name 0",
+	"categoryDescription" : "Test category description 0"
+}
+
+2.http://localhost:8080/add-new-categories : POST call
+
+upload category import file
+
+3.http://localhost:8080/update-category : POST call
+[
+	{
+	"categoryId" : "Category_2",
+	"categoryName" : "Test category name 1",
+	"categoryDescription" : "Test Category description 1"
+	}
+]
+
+4.http://localhost:8080/add-new-product : POST call
+{
+	"productName" : "Test Product 4",
+	"displayName" : "Test Product Display Name 4",
+	"description" : "Test product description 4",
+	"categoryName": "Test category name 3"
+}
+
+5.http://localhost:8080/add-new-products : POST call
+upload product import file
+
+6.http://localhost:8080/update-products : POST call
+[
+	{
+		"productId" : "Product_1",
+		"price" : "100",
+		"cost" : "60"
+	}
+]
+
+7.http://localhost:8080/quick-search-category : POST Call
+[
+    {
+        "categoryId": "Category_1",
+        "categoryName": "Test category name 1",
+        "categoryDispName": "Test category display name 1",
+        "categoryDescription": "Test category description 1"
+    }
+]
+
+8.http://localhost:8080/add-new-purchase-order : POST Call
+
+[
+	{
+		"vendorId":"20200001",
+		"invoiceId":"2020002",
+		"invoiceDate":"20200814",
+		"productsList":[
+			{
+				"productId":"Product_1",
+				"batchNo":"1234567895",
+				"quantity":"20",
+				"price": "480",
+				"sgst":"18",
+				"mfgDate":"2019-12-23",
+				"expDate":"2020-12-21"
+			},
+			{
+				"productId":"Product_2",
+				"batchNo":"1234567891",
+				"quantity":"10",
+				"price": "920",
+				"sgst":"18",
+				"mfgDate":"2019-12-23",
+				"expDate":"2020-12-21"
+			}
+		]
+	}	
+]

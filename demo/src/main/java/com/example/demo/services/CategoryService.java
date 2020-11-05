@@ -73,7 +73,7 @@ public class CategoryService {
 		return catId.intValue();
 	}
 	
-	private List<String> getCategoryNames() {
+	public List<String> getCategoryNames() {
 		String query = "SELECT NAME FROM CATEGORY_DET";
 		return jdbcTemplate.queryForList(query, String.class);
 	}

@@ -67,4 +67,9 @@ public class CategoryController {
 	public List<CategoryDetailsBO> getCategoriesOnQuickSearch(@RequestBody String filterParam){
 		return categoryService.getQuickSearchedCategory(filterParam);
 	}
+	
+	@GetMapping(path="/categories-names")
+	public List<String> getCategoryNames(){
+		return categoryService.getCategoryNames();
+	}
 }

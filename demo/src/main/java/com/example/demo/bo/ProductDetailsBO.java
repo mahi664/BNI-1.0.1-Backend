@@ -14,6 +14,7 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	private 	double		cgst;
 	private 	double 		sgst;
 	private 	double 		igst;
+	private 	double 		gst;
 	private 	String 		unit;
 	private 	String 		batchNo;
 	private 	Date 		mfgDate;
@@ -108,6 +109,12 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	}
 	public void setExpDate(Date expDate) {
 		this.expDate = expDate;
+	}
+	public double getGst() {
+		return gst;
+	}
+	public void setGst(double gst) {
+		this.gst = gst;
 	}
 	
 	

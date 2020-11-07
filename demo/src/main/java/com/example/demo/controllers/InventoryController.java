@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.bo.GstDetailsBO;
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.services.InventoryService;
 import com.example.demo.storage.StorageService;
@@ -42,5 +44,16 @@ public class InventoryController {
 	@PostMapping(path="/update-products")
 	public String updateProducts(@RequestBody List<ProductDetailsBO> productList){
 		return inventoryService.updateProducts(productList);
+	}
+	
+	@PostMapping(path="/add-gst-rate")
+	public String addGstDetails(@RequestBody GstDetailsBO gstDet) {
+		return inventoryService.addGstDetails(gstDet);
+	}
+	
+	@GetMapping(path="/get-gst-rates")
+	public List<GstDetailsBO> getGstRates(){
+		return inventoryService.getGstRates();
+		
 	}
 }

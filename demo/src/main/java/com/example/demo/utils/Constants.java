@@ -16,6 +16,7 @@ public class Constants {
 	public static final  	String 		CGST 		= 	"CGST";
 	public static final  	String 		SGST 		= 	"SGST";
 	public static final  	String 		IGST 		= 	"IGST";
+	public static final  	String 		GST 		= 	"IGST";
 	public static final		String	 	PIDANDENDDATEWHERECLAUSE = "WHERE PRODUCT_ID=? AND END_DATE_SKEY=?";
 	public static final 	String		VALUESFORINSERT = "VALUES(?,?,?,?,?)";
 	

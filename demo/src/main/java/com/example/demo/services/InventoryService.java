@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,12 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.bo.GstDetailsBO;
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
@@ -60,9 +64,9 @@ public class InventoryService {
 		ret = insertProdToIGSTMap(productList, effDate);
 		if (ret.length <= 0)
 			return "Error in adding products IGST details!!";
-		ret = insertProdToDiscountMap(productList, effDate);
-		if (ret.length <= 0)
-			return "Error in adding products discount details!!";
+//		ret = insertProdToDiscountMap(productList, effDate);
+//		if (ret.length <= 0)
+//			return "Error in adding products discount details!!";
 		return "Products added successfully";
 	}
 
@@ -73,12 +77,12 @@ public class InventoryService {
 			return "Error in adding Product. Duplicate for " + prodBO.getProductName();
 		if (!catName2IdMap.containsKey(prodBO.getCategoryName()))
 			return "Error in adding Product. Invalid Category Name: " + prodBO.getCategoryName();
-		if (prodBO.getCgst() != 0 && !gst2RatesMap.get(Constants.CGST).contains(prodBO.getCgst()))
-			return "Error in adding Product. Invalid CGST Rate: " + prodBO.getCgst();
-		if (prodBO.getSgst() != 0 && !gst2RatesMap.get(Constants.SGST).contains(prodBO.getSgst()))
-			return "Error in adding Product. Invalid SGST Rate: " + prodBO.getSgst();
-		if (prodBO.getIgst() != 0 && !gst2RatesMap.get(Constants.IGST).contains(prodBO.getIgst()))
-			return "Error in adding Product. Invalid IGST Rate: " + prodBO.getIgst();
+//		if (prodBO.getCgst() != 0 && !gst2RatesMap.get(Constants.CGST).contains(prodBO.getCgst()))
+//			return "Error in adding Product. Invalid CGST Rate: " + prodBO.getCgst();
+//		if (prodBO.getSgst() != 0 && !gst2RatesMap.get(Constants.SGST).contains(prodBO.getSgst()))
+//			return "Error in adding Product. Invalid SGST Rate: " + prodBO.getSgst();
+		if (prodBO.getGst() != 0 && !gst2RatesMap.get(Constants.GST).contains(prodBO.getGst()))
+			return "Error in adding Product. Invalid GST Rate: " + prodBO.getIgst();
 		if (prodBO.getUnit().equals(""))
 			return "Error in adding Product. Unit should not be blank";
 		return null;
@@ -92,7 +96,7 @@ public class InventoryService {
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				ps.setInt(1, productList.get(i).getProductId());
-				ps.setDouble(2, productList.get(i).getSgst());
+				ps.setDouble(2, productList.get(i).getGst()/2);
 				ps.setInt(3, DateUtils.dateSkey(effDate));
 				ps.setInt(4, DateUtils.dateSkey(Constants.MAX_DATE));
 				ps.setDate(5, new java.sql.Date(new Date().getTime()));
@@ -113,7 +117,7 @@ public class InventoryService {
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				ps.setInt(1, productList.get(i).getProductId());
-				ps.setDouble(2, productList.get(i).getCgst());
+				ps.setDouble(2, productList.get(i).getGst()/2);
 				ps.setInt(3, DateUtils.dateSkey(effDate));
 				ps.setInt(4, DateUtils.dateSkey(Constants.MAX_DATE));
 				ps.setDate(5, new java.sql.Date(new Date().getTime()));
@@ -172,17 +176,17 @@ public class InventoryService {
 	private Map<String, List<Double>> populateGSTRates() {
 		Map<String, List<Double>> gstRatesMap = new HashMap<>();
 
-		String query = "SELECT GST_RATE FROM CGST_RATES";
+		String query = "SELECT GST_RATE FROM GST_RATES";
 		List<Double> list = jdbcTemplate.queryForList(query, Double.class);
-		gstRatesMap.put(Constants.CGST, list);
+		gstRatesMap.put(Constants.GST, list);
 
-		query = "SELECT GST_RATE FROM SGST_RATES";
-		list = jdbcTemplate.queryForList(query, Double.class);
-		gstRatesMap.put(Constants.SGST, list);
-
-		query = "SELECT GST_RATE FROM IGST_RATES";
-		list = jdbcTemplate.queryForList(query, Double.class);
-		gstRatesMap.put(Constants.IGST, list);
+//		query = "SELECT GST_RATE FROM SGST_RATES";
+//		list = jdbcTemplate.queryForList(query, Double.class);
+//		gstRatesMap.put(Constants.SGST, list);
+//
+//		query = "SELECT GST_RATE FROM IGST_RATES";
+//		list = jdbcTemplate.queryForList(query, Double.class);
+//		gstRatesMap.put(Constants.IGST, list);
 
 		return gstRatesMap;
 	}
@@ -240,7 +244,7 @@ public class InventoryService {
 		String catId = jdbcTemplate.queryForObject(query, String.class);
 		if (catId == null)
 			return 0;
-		return Integer.parseInt(catId.split("_")[1]);
+		return Integer.parseInt(catId);
 	}
 
 	@Transactional
@@ -484,6 +488,46 @@ public class InventoryService {
 			query += "PRODUCT_DESC=?";
 		}
 		return query;
+	}
+
+	public String addGstDetails(GstDetailsBO gstDet) {
+		int ret = insertGstRates(gstDet);
+		if(ret<=0)
+			return "Error in adding GST rate!";
+		return "GST rate added successfully!";
+	}
+
+	private int insertGstRates(GstDetailsBO gstDet) {
+		String query = "INSERT INTO GST_RATES (GST_RATE,NAME) VALUES(?,?)";
+		
+		return jdbcTemplate.update(query, new PreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setDouble(1, gstDet.getGstRate());
+				ps.setString(2, gstDet.getGstName());
+				
+			}
+			
+		});
+	}
+
+	public List<GstDetailsBO> getGstRates() {
+		String query = "SELECT NAME,GST_RATE FROM GST_RATES";
+		return jdbcTemplate.query(query, new ResultSetExtractor<List<GstDetailsBO>>() {
+			List<GstDetailsBO> retList = new ArrayList<>();
+			@Override
+			public List<GstDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					GstDetailsBO gstBo = new GstDetailsBO();
+					gstBo.setGstName(rs.getString(1));
+					gstBo.setGstRate(rs.getDouble(2));
+					retList.add(gstBo);
+				}
+				return retList;
+			}
+			
+		});
 	}
 
 }

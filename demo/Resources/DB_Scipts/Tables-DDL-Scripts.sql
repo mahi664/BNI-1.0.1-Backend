@@ -281,5 +281,6 @@ ALTER TABLE `purchase_order_det`
 	FOREIGN KEY(`PRODUCT_ID`)
 	REFERENCES `product_det`(`PRODUCT_ID`);
 
+RENAME TABLE `sgst_rates` TO `gst_rates`;
 
 

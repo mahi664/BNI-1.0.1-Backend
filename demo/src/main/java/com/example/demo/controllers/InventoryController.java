@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.bo.GstDetailsBO;
+import com.example.demo.bo.ProductDisplayDetailsBO;
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.services.InventoryService;
 import com.example.demo.storage.StorageService;
@@ -56,4 +57,11 @@ public class InventoryController {
 		return inventoryService.getGstRates();
 		
 	}
+	
+	@GetMapping(path="/get-inventory-details")
+	public List<ProductDisplayDetailsBO> getInventoryDetails(){
+		return inventoryService.getInventoryDetails();
+	}
+	
+	
 }

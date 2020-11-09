@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.bo.GstDetailsBO;
+import com.example.demo.bo.InventoryBO;
+import com.example.demo.bo.ProductDisplayDetailsBO;
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
@@ -528,6 +530,76 @@ public class InventoryService {
 			}
 			
 		});
+	}
+
+	public List<ProductDisplayDetailsBO> getInventoryDetails() {
+		Map<Integer,ProductDisplayDetailsBO> productId2DetMap = new HashMap<>();
+		populateProdutBasicDetails(productId2DetMap);
+		populateInventoyDetailsForproduct(productId2DetMap);
+		return new ArrayList<>( productId2DetMap.values());
+	}
+
+	private void populateInventoyDetailsForproduct(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query =  "SELECT B.PRODUCT_ID, B.BATCH_NO,B.QUANTITY,B.PRICE,B.COST,B.GST,B.MFG_DATE,B.EXP_DATE,B.IN_STOCK \r\n" + 
+				"FROM product_det A, purchase_order_det B \r\n" + 
+				"WHERE A.PRODUCT_ID = B.PRODUCT_ID";
+		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					if(!productId2DetMap.containsKey(rs.getInt(1)))
+						continue;
+					ProductDisplayDetailsBO prodDispObj = productId2DetMap.get(rs.getInt(1));
+					if(prodDispObj!=null) {
+						InventoryBO inventoryObj = new InventoryBO();
+						inventoryObj.setBatchNo(rs.getString(2));
+						inventoryObj.setTotalQty(rs.getDouble(3));
+						inventoryObj.setSellingPrice(rs.getDouble(4));
+						inventoryObj.setPurchasedCost(rs.getDouble(5));
+						inventoryObj.setGst(rs.getDouble(6));
+						inventoryObj.setMfgDate(rs.getDate(7));
+						inventoryObj.setExpDate(rs.getDate(8));
+						inventoryObj.setInStock(rs.getDouble(9));
+						List<InventoryBO> inventoryDetObj = prodDispObj.getInventories();
+						if(inventoryDetObj == null)
+							inventoryDetObj = new ArrayList<>();
+						inventoryDetObj.add(inventoryObj);
+						
+					}
+				}
+				return null;
+			}
+			
+		});
+	}
+
+	private void populateProdutBasicDetails(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query = "SELECT A.PRODUCT_ID,A.PRODUCT_NAME,A.PRODUCT_DESC,A.UNIT,B.NAME\r\n" + 
+				"FROM product_det A, category_det B, product_category_map C\r\n" + 
+				"WHERE A.PRODUCT_ID = C.PRODUCT_ID AND B.CATEGORY_ID = C.CATEGORY_ID";
+		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					int productId = rs.getInt(1);
+					if(!productId2DetMap.containsKey(productId)) {
+						productId2DetMap.put(productId,new ProductDisplayDetailsBO());
+					}
+					
+					ProductDisplayDetailsBO prodDispDet = productId2DetMap.get(productId);
+					prodDispDet.setProductId(productId);
+					prodDispDet.setProductName(rs.getString(2));
+					prodDispDet.setDescription(rs.getString(3));
+					prodDispDet.setUnit(rs.getString(4));
+					prodDispDet.setCategory(rs.getString(5));
+				}
+				return null;
+			}
+			
+		});
+			
 	}
 
 }

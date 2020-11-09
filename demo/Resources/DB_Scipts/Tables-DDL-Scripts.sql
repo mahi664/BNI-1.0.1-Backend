@@ -283,4 +283,11 @@ ALTER TABLE `purchase_order_det`
 
 RENAME TABLE `sgst_rates` TO `gst_rates`;
 
+ALTER TABLE `purchase_order_det` MODIFY COLUMN `QUANTITY` double(16,4) NULL;
+
+ALTER TABLE `purchase_order_det` MODIFY COLUMN `RF1` double(16,4) NOT NULL;
+
+ALTER TABLE `purchase_order_det` CHANGE COLUMN `RF1` `IN_STOCK` double(16,4) NOT NULL;
+
+
 

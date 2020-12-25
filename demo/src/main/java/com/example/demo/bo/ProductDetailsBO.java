@@ -116,6 +116,14 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	public void setGst(double gst) {
 		this.gst = gst;
 	}
+	@Override
+	public String toString() {
+		return "ProductDetailsBO [productId=" + productId + ", productName=" + productName + ", displayName="
+				+ displayName + ", description=" + description + ", cost=" + cost + ", price=" + price + ", discount="
+				+ discount + ", quantity=" + quantity + ", cgst=" + cgst + ", sgst=" + sgst + ", igst=" + igst
+				+ ", gst=" + gst + ", unit=" + unit + ", batchNo=" + batchNo + ", mfgDate=" + mfgDate + ", expDate="
+				+ expDate + "]";
+	}
 	
 	
 	

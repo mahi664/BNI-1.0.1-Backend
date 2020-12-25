@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -63,5 +64,14 @@ public class InventoryController {
 		return inventoryService.getInventoryDetails();
 	}
 	
+	@GetMapping(path="/get-product-names")
+	public List<String> getProductNames(){
+		return inventoryService.getProductNames();
+	}
+	
+	@GetMapping(path="/get-product-gst-map")
+	public Map<String, Double> getProductGstMap(){
+		return inventoryService.getProductGstMap();
+	}
 	
 }

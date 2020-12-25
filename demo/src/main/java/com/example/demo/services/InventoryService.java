@@ -236,7 +236,7 @@ public class InventoryService {
 		});
 	}
 
-	private List<String> getProductNames() {
+	public List<String> getProductNames() {
 		String query = "SELECT PRODUCT_NAME FROM PRODUCT_DET";
 		return jdbcTemplate.queryForList(query, String.class);
 	}
@@ -600,6 +600,24 @@ public class InventoryService {
 			
 		});
 			
+	}
+
+	public Map<String, Double> getProductGstMap() {
+		String query="SELECT A.PRODUCT_NAME,B.GST_RATE*2\r\n" + 
+				"FROM product_det A, product_cgst_map B \r\n" + 
+				"WHERE A.PRODUCT_ID = B.PRODUCT_ID";
+		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, Double>>(){
+			
+			Map<String, Double> prodName2GstMap = new HashMap<>();
+			@Override
+			public Map<String, Double> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					prodName2GstMap.put(rs.getString(1), rs.getDouble(2));
+				}
+				return prodName2GstMap;
+			}
+			
+		});
 	}
 
 }

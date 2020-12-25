@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.bo.PurchaseDetailsBO;
+import com.example.demo.bo.VendorDetailsBO;
 
 @Service
 public class PurchaseOrderService {
@@ -23,25 +24,34 @@ public class PurchaseOrderService {
 	private JdbcTemplate jdbcTemplate;
 
 	@Transactional
-	public String addNewPurchaseOrder(List<PurchaseDetailsBO> purchaseBOs) {
-		for(int i=0;i<purchaseBOs.size();i++){
-			insertVendorInvoiceMap(purchaseBOs.get(i).getVendorId(),purchaseBOs.get(i).getInvoiceId(),purchaseBOs.get(i).getInvoiceDate());
-			int[] ret = insertPurchaseOrder(purchaseBOs.get(i).getInvoiceId(),purchaseBOs.get(i).getProductsList());
-			if (ret.length <= 0)
-				return "Error in inserting purchase order";
-		}
+	public String addNewPurchaseOrder(VendorDetailsBO vendorDetBO) {
+//		for(int i=0;i<purchaseBOs.size();i++){
+//			insertVendorInvoiceMap(purchaseBOs.get(i).getVendorId(),purchaseBOs.get(i).getInvoiceId(),purchaseBOs.get(i).getInvoiceDate());
+//			int[] ret = insertPurchaseOrder(purchaseBOs.get(i).getInvoiceId(),purchaseBOs.get(i).getProductsList());
+//			if (ret.length <= 0)
+//				return "Error in inserting purchase order";
+//		}
+//		return "Purchase order added successfully";
+		
+		System.out.println(vendorDetBO.toString());
+		int retVal = insertVendorInvoiceMap(vendorDetBO.getVendorId(), vendorDetBO.getInvoices().get(0).getInvoiceId(),vendorDetBO.getInvoices().get(0).getDateSkey());
+		if(retVal<=0)
+			return "Error in mapping vendor to receipt map";
+		int[] retVals = insertPurchaseOrder(vendorDetBO.getInvoices().get(0).getInvoiceId(), vendorDetBO.getInvoices().get(0).getProducts());
+		if(retVals.length<=0)
+			return "Error in adding new purhase order";
 		return "Purchase order added successfully";
 
 	}
 
-	private int insertVendorInvoiceMap(String vendorId, String invoiceId, int invoiceDate) {
+	private int insertVendorInvoiceMap(int vendorId, String invoiceId, int invoiceDate) {
 		String query = "INSERT INTO VENDOR_RECEIPT_MAP(VENDOR_ID,INVOICE_ID,DATE_SKEY) "+
 						"VALUES(?,?,?)";
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
 			@Override
 			public void setValues(PreparedStatement ps) throws SQLException {
-				ps.setString(1, vendorId);
+				ps.setInt(1, vendorId);
 				ps.setString(2, invoiceId);
 				ps.setInt(3, invoiceDate);
 			}

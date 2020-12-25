@@ -1,7 +1,10 @@
 package com.example.demo.bo;
 
+
+import java.util.List;
+
 public class VendorDetailsBO {
-	private 	String 		vendorId;
+	private 	int 		vendorId;
 	private 	String 		vendorName;
 	private 	String 		city;
 	private 	String 		district;
@@ -9,10 +12,20 @@ public class VendorDetailsBO {
 	private 	String 		phone;
 	private 	String 		email;
 	private 	int 		gstNo;
-	public String getVendorId() {
+	
+	private 	List<InvoiceDetailsBO>	invoices =	null;
+	
+	
+	public List<InvoiceDetailsBO> getInvoices() {
+		return invoices;
+	}
+	public void setInvoices(List<InvoiceDetailsBO> invoices) {
+		this.invoices = invoices;
+	}
+	public int getVendorId() {
 		return vendorId;
 	}
-	public void setVendorId(String vendorId) {
+	public void setVendorId(int vendorId) {
 		this.vendorId = vendorId;
 	}
 	public String getVendorName() {
@@ -57,6 +70,13 @@ public class VendorDetailsBO {
 	public void setGstNo(int gstNo) {
 		this.gstNo = gstNo;
 	}
+	@Override
+	public String toString() {
+		return "VendorDetailsBO [vendorId=" + vendorId + ", vendorName=" + vendorName + ", city=" + city + ", district="
+				+ district + ", state=" + state + ", phone=" + phone + ", email=" + email + ", gstNo=" + gstNo
+				+ ", invoices=" + invoices + "]";
+	}
+	
 	
 	
 }

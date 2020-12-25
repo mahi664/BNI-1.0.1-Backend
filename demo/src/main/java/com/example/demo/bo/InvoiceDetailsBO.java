@@ -12,7 +12,7 @@ public class InvoiceDetailsBO {
 	private		double							unpaid;
 	
 	//List of products belongs to this Invoice
-	private 	ArrayList<ProductDetailsBO>		prodcutsList = 		null;
+	private 	ArrayList<ProductDetailsBO>		products = 		null;
 
 	public String getInvoiceId() {
 		return invoiceId;
@@ -62,11 +62,20 @@ public class InvoiceDetailsBO {
 		this.unpaid = unpaid;
 	}
 
-	public List<ProductDetailsBO> getProdcutsList() {
-		return prodcutsList;
+	public ArrayList<ProductDetailsBO> getProducts() {
+		return products;
 	}
 
-	public void setProdcutsList(List<ProductDetailsBO> prodcutsList) {
-		this.prodcutsList = (ArrayList<ProductDetailsBO>) prodcutsList;
+	public void setProducts(ArrayList<ProductDetailsBO> products) {
+		this.products = products;
 	}
+
+	@Override
+	public String toString() {
+		return "InvoiceDetailsBO [invoiceId=" + invoiceId + ", dateSkey=" + dateSkey + ", paymentStatus="
+				+ paymentStatus + ", totalPrice=" + totalPrice + ", paid=" + paid + ", unpaid=" + unpaid + ", products="
+				+ products + "]";
+	}
+
+	
 }

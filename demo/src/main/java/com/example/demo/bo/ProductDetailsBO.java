@@ -8,7 +8,7 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	private 	String 		displayName;
 	private 	String 		description;
 	private 	double		cost;
-	private		double		price;
+	private		double		sellingPrice;
 	private 	double		discount;
 	private 	int 		quantity;
 	private 	double		cgst;
@@ -19,7 +19,34 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	private 	String 		batchNo;
 	private 	Date 		mfgDate;
 	private		Date		expDate;
+	private		double 		mrp;
+	private 	String 		manufacturer;
+	private 	String 		packaging;
 	
+	public double getSellingPrice() {
+		return sellingPrice;
+	}
+	public void setSellingPrice(double sellingPrice) {
+		this.sellingPrice = sellingPrice;
+	}
+	public double getMrp() {
+		return mrp;
+	}
+	public void setMrp(double mrp) {
+		this.mrp = mrp;
+	}
+	public String getManufacturer() {
+		return manufacturer;
+	}
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+	public String getPackaging() {
+		return packaging;
+	}
+	public void setPackaging(String packaging) {
+		this.packaging = packaging;
+	}
 	public String getBatchNo() {
 		return batchNo;
 	}
@@ -55,12 +82,6 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	}
 	public void setCost(double cost) {
 		this.cost = cost;
-	}
-	public double getPrice() {
-		return price;
-	}
-	public void setPrice(double price) {
-		this.price = price;
 	}
 	public double getDiscount() {
 		return discount;
@@ -119,7 +140,7 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	@Override
 	public String toString() {
 		return "ProductDetailsBO [productId=" + productId + ", productName=" + productName + ", displayName="
-				+ displayName + ", description=" + description + ", cost=" + cost + ", price=" + price + ", discount="
+				+ displayName + ", description=" + description + ", cost=" + cost + ", price=" + sellingPrice + ", discount="
 				+ discount + ", quantity=" + quantity + ", cgst=" + cgst + ", sgst=" + sgst + ", igst=" + igst
 				+ ", gst=" + gst + ", unit=" + unit + ", batchNo=" + batchNo + ", mfgDate=" + mfgDate + ", expDate="
 				+ expDate + "]";

@@ -216,8 +216,9 @@ public class InventoryService {
 	}
 
 	private int[] insertProduct(List<ProductDetailsBO> productList) {
-		String query = "INSERT INTO PRODUCT_DET(PRODUCT_ID,PRODUCT_NAME,DISP_NAME,PRODUCT_DESC,UNIT)"
-				+ Constants.VALUESFORINSERT;
+		String query = "INSERT INTO PRODUCT_DET(PRODUCT_ID,PRODUCT_NAME,DISP_NAME,PRODUCT_DESC,UNIT,"
+				+ "MRP,MANUFACTURER,SELLING_PRICE,PACKAGING)"
+				+ "VALUES(?,?,?,?,?,?,?,?,?)";
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 
 			@Override
@@ -227,6 +228,10 @@ public class InventoryService {
 				ps.setString(3, productList.get(i).getDisplayName());
 				ps.setString(4, productList.get(i).getDescription());
 				ps.setString(5, productList.get(i).getUnit());
+				ps.setDouble(6, productList.get(i).getMrp());
+				ps.setString(7, productList.get(i).getManufacturer());
+				ps.setDouble(8, productList.get(i).getSellingPrice());
+				ps.setString(9, productList.get(i).getPackaging());
 			}
 
 			@Override
@@ -265,15 +270,20 @@ public class InventoryService {
 
 	private void udateRequiredProductFields(ProductDetailsBO prodBO) {
 		Map<String, String> catName2IdM = categoryService.getCategoryIdToNameMap();
-		if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || prodBO.getDescription() != null)
+		if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || 
+				prodBO.getDescription() != null || prodBO.getUnit()!=null || prodBO.getMrp()!=0 ||
+				prodBO.getSellingPrice()!=0 || prodBO.getManufacturer()!=null || prodBO.getPackaging()!=null){
+				
 			updateProductBasicDetails(prodBO);
+		}
+			
 		if (prodBO.getCategoryName() != null) {
 			updateProductCategory(prodBO.getProductId());
 			List<ProductDetailsBO> tempProdL = new ArrayList<>();
 			tempProdL.add(prodBO);
 			insertProductToCategoryMap(tempProdL, catName2IdM, new Date());
 		}
-		if (prodBO.getPrice() != 0) {
+		if (prodBO.getSellingPrice() != 0) {
 			updateProductPrice(prodBO.getProductId());
 			insertProductPrice(prodBO);
 		}
@@ -408,7 +418,7 @@ public class InventoryService {
 			@Override
 			public void setValues(PreparedStatement ps) throws SQLException {
 				ps.setInt(1, prodBO.getProductId());
-				ps.setDouble(2, prodBO.getPrice());
+				ps.setDouble(2, prodBO.getSellingPrice());
 				ps.setInt(3, DateUtils.dateSkey(new Date()));
 				ps.setInt(4, DateUtils.dateSkey(Constants.MAX_DATE));
 				ps.setDate(5, new java.sql.Date(new Date().getTime()));
@@ -465,6 +475,14 @@ public class InventoryService {
 					ps.setString(paramIndx++, prodBO.getDescription());
 				if (prodBO.getUnit() != null)
 					ps.setString(paramIndx++, prodBO.getUnit());
+				if(prodBO.getMrp()!=0)
+					ps.setDouble(paramIndx++, prodBO.getMrp());
+				if(prodBO.getSellingPrice()!=0)
+					ps.setDouble(paramIndx++, prodBO.getSellingPrice());
+				if(prodBO.getManufacturer()!=null)
+					ps.setString(paramIndx++, prodBO.getManufacturer());
+				if(prodBO.getPackaging()!=null)
+					ps.setString(paramIndx++, prodBO.getPackaging());
 				ps.setInt(paramIndx, prodBO.getProductId());
 			}
 		});
@@ -487,7 +505,33 @@ public class InventoryService {
 		if (prodBO.getUnit() != null) {
 			if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || prodBO.getDescription() != null)
 				query += ",";
-			query += "PRODUCT_DESC=?";
+			query += "UNIT=?";
+		}
+		if(prodBO.getMrp()!=0){
+			if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || 
+					prodBO.getDescription() != null || prodBO.getUnit()!=null)
+				query+=",";
+			query+="MRP=?";
+		}
+		if(prodBO.getSellingPrice()!=0){
+			if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || 
+					prodBO.getDescription() != null || prodBO.getUnit()!=null || prodBO.getMrp()!=0)
+				query+=",";
+			query+="SELLING_PRICE=?";
+		}
+		if(prodBO.getManufacturer()!=null){
+			if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || 
+					prodBO.getDescription() != null || prodBO.getUnit()!=null || prodBO.getMrp()!=0
+					|| prodBO.getSellingPrice()!=0)
+				query+=",";
+			query+="MANUFACTURER=?";
+		}
+		if(prodBO.getPackaging()!=null){
+			if (prodBO.getProductName() != null || prodBO.getDisplayName() != null || 
+					prodBO.getDescription() != null || prodBO.getUnit()!=null || prodBO.getMrp()!=0
+					|| prodBO.getSellingPrice()!=0 || prodBO.getManufacturer()!=null)
+				query+=",";
+			query+="PACKAGING=?";
 		}
 		return query;
 	}
@@ -575,7 +619,8 @@ public class InventoryService {
 	}
 
 	private void populateProdutBasicDetails(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
-		String query = "SELECT A.PRODUCT_ID,A.PRODUCT_NAME,A.PRODUCT_DESC,A.UNIT,B.NAME\r\n" + 
+		String query = "SELECT A.PRODUCT_ID,A.PRODUCT_NAME,A.PRODUCT_DESC,A.UNIT,A.MRP,"
+				+ "A.MANUFACTURER, A.SELLING_PRICE, A.PACKAGING,B.NAME\r\n" + 
 				"FROM product_det A, category_det B, product_category_map C\r\n" + 
 				"WHERE A.PRODUCT_ID = C.PRODUCT_ID AND B.CATEGORY_ID = C.CATEGORY_ID";
 		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
@@ -593,7 +638,11 @@ public class InventoryService {
 					prodDispDet.setProductName(rs.getString(2));
 					prodDispDet.setDescription(rs.getString(3));
 					prodDispDet.setUnit(rs.getString(4));
-					prodDispDet.setCategory(rs.getString(5));
+					prodDispDet.setMrp(rs.getDouble(5));
+					prodDispDet.setManufacturer(rs.getString(6));
+					prodDispDet.setSellingPrice(rs.getDouble(7));
+					prodDispDet.setPackaging(rs.getString(8));
+					prodDispDet.setCategory(rs.getString(9));
 				}
 				return null;
 			}

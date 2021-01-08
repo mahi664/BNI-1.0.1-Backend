@@ -100,7 +100,7 @@ CREATE TABLE `order_det` (
 CREATE TABLE `customer_det` (
   `CUSTOMER_ID` INT NOT NULL,
   `NAME` VARCHAR(500) NULL,
-  `PHONE` VARCHAR(12) NULL,
+  `PHONE` VARCHAR(12) NOT NULL,
   `EMAIL` VARCHAR(500) NULL,
   `ADDRESS` VARCHAR(500) NULL,
   `RF1` INT NULL,
@@ -169,21 +169,21 @@ ALTER TABLE category_det CHANGE `DESC` `CATEGORY_DESC` varchar(1000);
 
 
 CREATE TABLE `cgst_rates` ( 
-	`GST_RATE`	double NULL,
+	`GST_RATE`	double not NULL,
 	`NAME`    	varchar(100) NULL,
 	PRIMARY KEY(`GST_RATE`)
 );
 
 
 CREATE TABLE `sgst_rates` ( 
-	`GST_RATE`	double NULL,
+	`GST_RATE`	double not NULL,
 	`NAME`    	varchar(100) NULL,
 	PRIMARY KEY(`GST_RATE`)
 );
 
 
 CREATE TABLE `igst_rates` ( 
-	`GST_RATE`	double NULL,
+	`GST_RATE`	double not NULL,
 	`NAME`    	varchar(100) NULL,
 	PRIMARY KEY(`GST_RATE`)
 );
@@ -192,10 +192,10 @@ ALTER TABLE product_det CHANGE `RF1` `UNIT` varchar(200);
 
 
 CREATE TABLE `product_sgst_map` ( 
-	`PRODUCT_ID`      	INT NULL,
-	`GST_RATE`        	double NULL,
-	`EFF_DATE_SKEY`   	integer(11) NULL,
-	`END_DATE_SKEY`   	integer(11) NULL,
+	`PRODUCT_ID`      	INT not NULL,
+	`GST_RATE`        	double not NULL,
+	`EFF_DATE_SKEY`   	integer(11) not NULL,
+	`END_DATE_SKEY`   	integer(11) not NULL,
 	`LAST_UPDATE_TIME`	datetime NULL,
 	PRIMARY KEY(`PRODUCT_ID`,`GST_RATE`,`EFF_DATE_SKEY`,`END_DATE_SKEY`)
 );
@@ -206,10 +206,10 @@ ALTER TABLE `product_sgst_map`
 
 
 CREATE TABLE `product_cgst_map` ( 
-	`PRODUCT_ID`      	INT NULL,
-	`GST_RATE`        	double NULL,
-	`EFF_DATE_SKEY`   	integer(11) NULL,
-	`END_DATE_SKEY`   	integer(11) NULL,
+	`PRODUCT_ID`      	INT not NULL,
+	`GST_RATE`        	double not NULL,
+	`EFF_DATE_SKEY`   	integer(11) not NULL,
+	`END_DATE_SKEY`   	integer(11) not NULL,
 	`LAST_UPDATE_TIME`	datetime NULL,
 	PRIMARY KEY(`PRODUCT_ID`,`GST_RATE`,`EFF_DATE_SKEY`,`END_DATE_SKEY`)
 );
@@ -220,11 +220,11 @@ ALTER TABLE `product_cgst_map`
 
 
 CREATE TABLE `product_igst_map` ( 
-	`PRODUCT_ID`      	INT NULL,
-	`GST_RATE`        	double NULL,
-	`EFF_DATE_SKEY`   	integer(11) NULL,
-	`END_DATE_SKEY`   	integer(11) NULL,
-	`LAST_UPDATE_TIME`	datetime NULL,
+	`PRODUCT_ID`      	INT not NULL,
+	`GST_RATE`        	double not NULL,
+	`EFF_DATE_SKEY`   	integer(11) not NULL,
+	`END_DATE_SKEY`   	integer(11) not NULL,
+	`LAST_UPDATE_TIME`	datetime not NULL,
 	PRIMARY KEY(`PRODUCT_ID`,`GST_RATE`,`EFF_DATE_SKEY`,`END_DATE_SKEY`)
 );
 ALTER TABLE `product_igst_map`
@@ -241,7 +241,7 @@ CREATE TABLE `vendor_det` (
 	`STATE`      	varchar(500) NULL,
 	`PHONE`      	varchar(12) NULL,
 	`EMAIL`      	varchar(500) NULL,
-	`GST_NO`     	integer(11) NULL,
+	`GST_NO`     	varchar(100) NULL,
 	`RF1`        	integer(11) NULL,
 	`RF2`        	integer(11) NULL,
 	`RF3`        	integer(11) NULL,
@@ -250,17 +250,17 @@ CREATE TABLE `vendor_det` (
 
 
 CREATE TABLE `vendor_receipt_map` ( 
-	`VENDOR_ID` 	INT NULL,
-	`INVOICE_ID`	varchar(200) NULL,
-	`DATE_SKEY`  	integer(11) NULL,
+	`VENDOR_ID` 	INT not NULL,
+	`INVOICE_ID`	varchar(200) not NULL,
+	`DATE_SKEY`  	integer(11) not NULL,
 	PRIMARY KEY(`VENDOR_ID`,`INVOICE_ID`,`DATE_SKEY`)
 );
 
 
 CREATE TABLE `purchase_order_det` ( 
 	`PRODUCT_ID` 	INT NOT NULL,
-	`INVOICE_ID` 	varchar(200) NULL,
-	`BATCH_NO`   	varchar(200) NULL,
+	`INVOICE_ID` 	varchar(200) NOT NULL,
+	`BATCH_NO`   	varchar(200) not NULL,
 	`QUANTITY`   	integer(11) NULL,
 	`PRICE`      	double NULL,
 	`COST`       	double NULL,
@@ -269,7 +269,7 @@ CREATE TABLE `purchase_order_det` (
 	`EXP_DATE`   	datetime NULL,
 	`BEST_BEFORE`	varchar(300) NULL,
 	`RF1`        	integer(11) NULL,
-	`RF2`        	integer(11) NULL,
+	`RF2`        	integer(11) NULL,	
 	`RF3`        	integer(11) NULL,
 	`RF4`        	integer(11) NULL,
 	`RF5`        	integer(11) NULL,
@@ -288,6 +288,8 @@ ALTER TABLE `purchase_order_det` MODIFY COLUMN `QUANTITY` double(16,4) NULL;
 ALTER TABLE `purchase_order_det` MODIFY COLUMN `RF1` double(16,4) NOT NULL;
 
 ALTER TABLE `purchase_order_det` CHANGE COLUMN `RF1` `IN_STOCK` double(16,4) NOT NULL;
+
+ALTER TABLE bni.vendor_det MODIFY COLUMN `GST_NO` VARCHAR NULL;
 
 
 

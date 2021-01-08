@@ -11,17 +11,46 @@ public class VendorDetailsBO {
 	private 	String 		state;
 	private 	String 		phone;
 	private 	String 		email;
-	private 	int 		gstNo;
+	private 	String 		gstNo;
+	private 	String 		uidNo;
+	private 	String 		village;
+	private 	String 		pinCode;
+	private 	String 		panNo;
 	
-	private 	List<InvoiceDetailsBO>	invoices =	null;
+//	private 	List<PurchaseDetailsBO> purchaseOrdersList = null;
 	
 	
-	public List<InvoiceDetailsBO> getInvoices() {
-		return invoices;
+//	public List<PurchaseDetailsBO> getPurchaseOrdersList() {
+//		return purchaseOrdersList;
+//	}
+//	public void setPurchaseOrdersList(List<PurchaseDetailsBO> purchaseOrdersList) {
+//		this.purchaseOrdersList = purchaseOrdersList;
+//	}
+	public String getUidNo() {
+		return uidNo;
 	}
-	public void setInvoices(List<InvoiceDetailsBO> invoices) {
-		this.invoices = invoices;
+	public void setUidNo(String uidNo) {
+		this.uidNo = uidNo;
 	}
+	public String getVillage() {
+		return village;
+	}
+	public void setVillage(String village) {
+		this.village = village;
+	}
+	public String getPinCode() {
+		return pinCode;
+	}
+	public void setPinCode(String pinCode) {
+		this.pinCode = pinCode;
+	}
+	public String getPanNo() {
+		return panNo;
+	}
+	public void setPanNo(String panNo) {
+		this.panNo = panNo;
+	}
+	
 	public int getVendorId() {
 		return vendorId;
 	}
@@ -64,17 +93,17 @@ public class VendorDetailsBO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public int getGstNo() {
+	public String getGstNo() {
 		return gstNo;
 	}
-	public void setGstNo(int gstNo) {
+	public void setGstNo(String gstNo) {
 		this.gstNo = gstNo;
 	}
 	@Override
 	public String toString() {
 		return "VendorDetailsBO [vendorId=" + vendorId + ", vendorName=" + vendorName + ", city=" + city + ", district="
 				+ district + ", state=" + state + ", phone=" + phone + ", email=" + email + ", gstNo=" + gstNo
-				+ ", invoices=" + invoices + "]";
+				+ ", uidNo=" + uidNo + ", village=" + village + ", pinCode=" + pinCode + ", panNo=" + panNo + "]";
 	}
 	
 	

@@ -33,15 +33,15 @@ public class PurchaseOrderService {
 //		}
 //		return "Purchase order added successfully";
 		
-		System.out.println(vendorDetBO.toString());
-		int retVal = insertVendorInvoiceMap(vendorDetBO.getVendorId(), vendorDetBO.getInvoices().get(0).getInvoiceId(),vendorDetBO.getInvoices().get(0).getDateSkey());
-		if(retVal<=0)
-			return "Error in mapping vendor to receipt map";
-		int[] retVals = insertPurchaseOrder(vendorDetBO.getInvoices().get(0).getInvoiceId(), vendorDetBO.getInvoices().get(0).getProducts());
-		if(retVals.length<=0)
-			return "Error in adding new purhase order";
-		return "Purchase order added successfully";
-
+//		System.out.println(vendorDetBO.toString());
+//		int retVal = insertVendorInvoiceMap(vendorDetBO.getVendorId(), vendorDetBO.getInvoices().get(0).getInvoiceId(),vendorDetBO.getInvoices().get(0).getDateSkey());
+//		if(retVal<=0)
+//			return "Error in mapping vendor to receipt map";
+//		int[] retVals = insertPurchaseOrder(vendorDetBO.getInvoices().get(0).getInvoiceId(), vendorDetBO.getInvoices().get(0).getProducts());
+//		if(retVals.length<=0)
+//			return "Error in adding new purhase order";
+//		return "Purchase order added successfully";
+		return null;
 	}
 
 	private int insertVendorInvoiceMap(int vendorId, String invoiceId, int invoiceDate) {
@@ -69,7 +69,7 @@ public class PurchaseOrderService {
 				ps.setString(2, invoiceId);
 				ps.setString(3, productsList.get(i).getBatchNo());
 				ps.setInt(4, productsList.get(i).getQuantity());
-				ps.setDouble(5, productsList.get(i).getPrice());
+				ps.setDouble(5, productsList.get(i).getSellingPrice());
 				ps.setDouble(6, productsList.get(i).getCost());
 				ps.setDouble(7, productsList.get(i).getSgst());
 				ps.setDate(8, new Date(productsList.get(i).getMfgDate().getTime()));

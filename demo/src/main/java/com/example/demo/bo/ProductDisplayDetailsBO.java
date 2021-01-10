@@ -12,6 +12,9 @@ public class ProductDisplayDetailsBO {
 	private double sellingPrice;
 	private String manufacturer;
 	private String packaging;
+	
+	private List<InventoryBO> inventories = null;
+	
 	public double getMrp() {
 		return mrp;
 	}
@@ -36,7 +39,7 @@ public class ProductDisplayDetailsBO {
 	public void setPackaging(String packaging) {
 		this.packaging = packaging;
 	}
-	private List<InventoryBO> inventories = null;
+	
 	
 	public List<InventoryBO> getInventories() {
 		return inventories;

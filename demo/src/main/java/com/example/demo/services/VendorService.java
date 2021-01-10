@@ -4,7 +4,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +15,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.bo.PurchaseDetailsBO;
 import com.example.demo.bo.VendorDetailsBO;
 
 @Service
@@ -65,13 +68,47 @@ public class VendorService {
 	}
 
 	public List<VendorDetailsBO> getVendorDetails() {
-		String query = "select VENDOR_ID,VENDOR_NAME,CITY,DISTRICT,STATE,PHONE,EMAIL,UID_NO,VILLAGE,"+
-				"PIN_CODE, GST_NO,PAN_NO from vendor_det";
-		return jdbcTemplate.query(query, new ResultSetExtractor<List<VendorDetailsBO>>(){
+		Map<Integer, VendorDetailsBO> vendorId2VendorDetM = new HashMap<>();
+		getVendorBasicDetails(vendorId2VendorDetM);
+		getVendorsPurchaseReceipts(vendorId2VendorDetM);
+		return new ArrayList<>(vendorId2VendorDetM.values());
+	}
+
+	private void getVendorsPurchaseReceipts(Map<Integer, VendorDetailsBO> vendorId2VendorDetM) {
+		String query = "select INVOICE_ID,VENDOR_ID,DATE_SKEY,DUE_AMT,TOTAL_AMT "+
+						"from vendor_receipt_map";
+		jdbcTemplate.query(query, new ResultSetExtractor<Void>(){
 
 			@Override
-			public List<VendorDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
-				List<VendorDetailsBO> vendorDetailsL = new ArrayList<>();
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()){
+					PurchaseDetailsBO purchaseOrdBO = new PurchaseDetailsBO();
+					purchaseOrdBO.setInvoiceId(rs.getString(1));
+					purchaseOrdBO.setInvoiceDateSkey(rs.getInt(3));
+					purchaseOrdBO.setTotalAmt(rs.getDouble(4));
+					purchaseOrdBO.setDueAmt(rs.getDouble(5));
+					purchaseOrdBO.setPaidAmt(purchaseOrdBO.getTotalAmt()-purchaseOrdBO.getDueAmt());
+					
+					List<PurchaseDetailsBO> purchaseOrdeL = vendorId2VendorDetM.get(rs.getInt(2)).getInvoices();
+					if(purchaseOrdeL==null)
+						purchaseOrdeL = new ArrayList<>();
+					purchaseOrdeL.add(purchaseOrdBO);
+					vendorId2VendorDetM.get(rs.getInt(2)).setInvoices(purchaseOrdeL);
+				}
+				return null;
+			}
+			
+		});
+		
+	}
+
+	private void getVendorBasicDetails(Map<Integer, VendorDetailsBO> vendorId2VendorDetM) {
+		String query = "select VENDOR_ID,VENDOR_NAME,CITY,DISTRICT,STATE,PHONE,EMAIL,UID_NO,VILLAGE,"+
+				"PIN_CODE, GST_NO,PAN_NO from vendor_det";
+		 jdbcTemplate.query(query, new ResultSetExtractor<Void>(){
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
 				while(rs.next()){
 					VendorDetailsBO vendorBO = new VendorDetailsBO();
 					vendorBO.setVendorId(rs.getInt(1));
@@ -87,9 +124,30 @@ public class VendorService {
 					vendorBO.setGstNo(rs.getString(11));
 					vendorBO.setPanNo(rs.getString(12));
 					
-					vendorDetailsL.add(vendorBO);
+					vendorId2VendorDetM.put(vendorBO.getVendorId(), vendorBO);
 				}
-				return vendorDetailsL;
+				
+				return null;
+			}
+			
+		});
+		
+	}
+
+	public List<VendorDetailsBO> getVendorList() {
+		String query = "SELECT VENDOR_ID,VENDOR_NAME FROM VENDOR_DET";
+		return jdbcTemplate.query(query, new ResultSetExtractor<List<VendorDetailsBO>>(){
+
+			@Override
+			public List<VendorDetailsBO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<VendorDetailsBO> vendorList = new ArrayList<>();
+				while(rs.next()){
+					VendorDetailsBO vendorBO = new VendorDetailsBO();
+					vendorBO.setVendorId(rs.getInt(1));
+					vendorBO.setVendorName(rs.getString(2));
+					vendorList.add(vendorBO);
+				}
+				return vendorList;
 			}
 			
 		});

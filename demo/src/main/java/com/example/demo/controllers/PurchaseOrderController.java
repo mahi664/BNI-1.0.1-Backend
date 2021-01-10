@@ -19,7 +19,7 @@ public class PurchaseOrderController {
 	@Autowired
 	private PurchaseOrderService purchaseOrderService;
 	
-	@PostMapping(path="/add-new-purchase-order")
+	@PostMapping(path="/add-new-purchase-invoice")
 	public String addNewPurchaseOrder(@RequestBody VendorDetailsBO vendorDetBO){
 		return purchaseOrderService.addNewPurchaseOrder(vendorDetBO);
 	}

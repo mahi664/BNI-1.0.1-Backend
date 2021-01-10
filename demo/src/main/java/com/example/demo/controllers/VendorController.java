@@ -28,4 +28,9 @@ public class VendorController {
 	public List<VendorDetailsBO> getVendorDetails(){
 		return vendorService.getVendorDetails();
 	}
+	
+	@GetMapping(path="get-vendor-list")
+	public List<VendorDetailsBO> getVendorList(){
+		return vendorService.getVendorList();
+	}
 }

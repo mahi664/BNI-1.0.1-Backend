@@ -54,6 +54,9 @@ public class InventoryService {
 		if (ret.length <= 0)
 			return "Error in adding products Basic details!!";
 		Date effDate = new Date();
+		ret = insertPoductStcokMap(productList,effDate);
+		if(ret.length<=0)
+			return "Error in adding Product stock map";
 		ret = insertProductToCategoryMap(productList, catName2IdMap, effDate);
 		if (ret.length <= 0)
 			return "Error in adding products category!!";
@@ -70,6 +73,27 @@ public class InventoryService {
 //		if (ret.length <= 0)
 //			return "Error in adding products discount details!!";
 		return "Products added successfully";
+	}
+
+	private int[] insertPoductStcokMap(List<ProductDetailsBO> productList, Date effDate) {
+		String query = "INSERT INTO PRODUCT_STOCK_MAP(PRODUCT_ID,AVAIL_STOCK,LAST_UPDATE_TIME,LAST_USER) "+
+						"VALUES(?,?,?,?)";
+		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setInt(1, productList.get(i).getProductId());
+				ps.setInt(2,0);
+				ps.setDate(3, DateUtils.getSqlDate(effDate));
+				ps.setString(4, null);
+			}
+			
+			@Override
+			public int getBatchSize() {
+				// TODO Auto-generated method stub
+				return productList.size();
+			}
+		});
 	}
 
 	private String validateProdDetBeforeInsert(ProductDetailsBO prodBO, Map<String, String> catName2IdMap) {
@@ -652,7 +676,7 @@ public class InventoryService {
 	}
 
 	public Map<String, Double> getProductGstMap() {
-		String query="SELECT A.PRODUCT_NAME,B.GST_RATE*2\r\n" + 
+		String query="SELECT A.PRODUCT_NAME,B.GST_RATE\r\n" + 
 				"FROM product_det A, product_cgst_map B \r\n" + 
 				"WHERE A.PRODUCT_ID = B.PRODUCT_ID";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, Double>>(){
@@ -667,6 +691,83 @@ public class InventoryService {
 			}
 			
 		});
+	}
+
+	public Map<String, Integer> getProductToIdMap() {
+		String query="SELECT PRODUCT_ID, PRODUCT_NAME " + 
+				"FROM product_det";
+		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, Integer>>(){
+			
+			Map<String, Integer> prodName2IdMap = new HashMap<>();
+			@Override
+			public Map<String, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					prodName2IdMap.put(rs.getString(2), rs.getInt(1));
+				}
+				return prodName2IdMap;
+			}
+			
+		});
+	}
+
+	public int[] updateProductStockMap(Map<Integer, Integer> product2AvailStockM) {
+		String query = "UPDATE PRODUCT_STOCK_MAP SET AVAIL_STOCK=?,LAST_UPDATE_TIME=?,LAST_USER=? "+
+						" WHERE PRODUCT_ID=?";
+		
+		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			List<Integer>prodIdList = new ArrayList<>(product2AvailStockM.keySet());
+			
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setInt(1, product2AvailStockM.get(prodIdList.get(i)));
+				ps.setDate(2, DateUtils.getSqlDate(new Date()));
+				ps.setString(3, null);
+				ps.setInt(4, prodIdList.get(i));
+			}
+			
+			@Override
+			public int getBatchSize() {
+				// TODO Auto-generated method stub
+				return product2AvailStockM.size();
+			}
+		});
+	}
+
+	public Map<Integer, Integer> getProductAvailStockMap(List<ProductDetailsBO> productsList) {
+		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM PRODUCT_STOCK_MAP "+
+					" WHERE PRODUCT_ID IN"+getInClause(productsList.size());
+		return jdbcTemplate.query(query, new PreparedStatementSetter(){
+
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				for(int i=1;i<=productsList.size();i++){
+					ps.setInt(i, productsList.get(i-1).getProductId());
+				}
+				
+			}
+			
+		}, new ResultSetExtractor<Map<Integer,Integer>>() {
+
+			@Override
+			public Map<Integer, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				Map<Integer, Integer> prod2AvailStockM = new HashMap<>();
+				while(rs.next()){
+					prod2AvailStockM.put(rs.getInt(1), rs.getInt(2));
+				}
+				return prod2AvailStockM;
+			}
+		});
+	}
+
+	private String getInClause(int size) {
+		String retString = "(";
+		for(int i=0;i<size;i++){
+			if(i!=0)
+				retString+=",";
+			retString+="?";
+		}
+		retString+=")";
+		return retString;
 	}
 
 }

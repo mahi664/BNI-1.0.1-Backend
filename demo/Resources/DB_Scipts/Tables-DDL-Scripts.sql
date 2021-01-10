@@ -291,5 +291,31 @@ ALTER TABLE `purchase_order_det` CHANGE COLUMN `RF1` `IN_STOCK` double(16,4) NOT
 
 ALTER TABLE bni.vendor_det MODIFY COLUMN `GST_NO` VARCHAR NULL;
 
+alter table vendor_receipt_map add column DUE_AMT double null;
+
+alter table vendor_receipt_map add column TOTAL_AMT double null;
+
+alter table vendor_receipt_map add column DISCOUNT double null;
+
+alter table vendor_receipt_map add column PAYMENT_TYPE VARCHAR(200) null;
+
+alter table vendor_receipt_map add column CHEQUE_NO VARCHAR(200) null;
+
+alter table vendor_receipt_map add column GST_AMT double null;
+
+alter table vendor_receipt_map add column ACC_NO varchar(200) null;
+
+create table PRODUCT_STOCK_MAP(
+	PRODUCT_ID 	INT NOT NULL,
+	AVAIL_STOCK INT not null,
+	LAST_UPDATE_TIME datetime null,
+	LAST_USER varchar(200) null,
+	
+	primary key(PRODUCT_ID)
+);
+ALTER TABLE PRODUCT_STOCK_MAP
+	ADD CONSTRAINT `FK20`
+	FOREIGN KEY(`PRODUCT_ID`)
+	REFERENCES `product_det`(`PRODUCT_ID`);
 
 

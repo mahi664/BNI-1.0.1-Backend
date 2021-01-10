@@ -17,15 +17,17 @@ public class VendorDetailsBO {
 	private 	String 		pinCode;
 	private 	String 		panNo;
 	
-//	private 	List<PurchaseDetailsBO> purchaseOrdersList = null;
+	private 	List<PurchaseDetailsBO> invoices = null;
 	
 	
-//	public List<PurchaseDetailsBO> getPurchaseOrdersList() {
-//		return purchaseOrdersList;
-//	}
-//	public void setPurchaseOrdersList(List<PurchaseDetailsBO> purchaseOrdersList) {
-//		this.purchaseOrdersList = purchaseOrdersList;
-//	}
+	
+	
+	public List<PurchaseDetailsBO> getInvoices() {
+		return invoices;
+	}
+	public void setInvoices(List<PurchaseDetailsBO> invoices) {
+		this.invoices = invoices;
+	}
 	public String getUidNo() {
 		return uidNo;
 	}

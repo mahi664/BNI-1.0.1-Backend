@@ -74,4 +74,8 @@ public class InventoryController {
 		return inventoryService.getProductGstMap();
 	}
 	
+	@GetMapping(path="/get-product-name-id-map")
+	public Map<String, Integer> getProductToIdMap(){
+		return inventoryService.getProductToIdMap();
+	}
 }

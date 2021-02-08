@@ -289,7 +289,7 @@ ALTER TABLE `purchase_order_det` MODIFY COLUMN `RF1` double(16,4) NOT NULL;
 
 ALTER TABLE `purchase_order_det` CHANGE COLUMN `RF1` `IN_STOCK` double(16,4) NOT NULL;
 
-ALTER TABLE bni.vendor_det MODIFY COLUMN `GST_NO` VARCHAR NULL;
+ALTER TABLE vendor_det MODIFY COLUMN `GST_NO` VARCHAR NULL;
 
 alter table vendor_receipt_map add column DUE_AMT double null;
 
@@ -317,5 +317,47 @@ ALTER TABLE PRODUCT_STOCK_MAP
 	ADD CONSTRAINT `FK20`
 	FOREIGN KEY(`PRODUCT_ID`)
 	REFERENCES `product_det`(`PRODUCT_ID`);
+
+alter table customer_det drop column address;
+
+alter table customer_det add column village varchar(200) null;
+alter table customer_det add column city varchar(200) null;
+alter table customer_det add column district varchar(200) null;
+alter table customer_det add column state varchar(200) null;
+alter table customer_det add column PIN_CODE varchar(200) null;
+alter table customer_det add column UID_NO varchar(200) null;
+alter table customer_det add column GST_NO varchar(200) null;
+alter table customer_det add column PAN_NO varchar(200) null;
+
+alter table vendor_det add column village varchar(200) null;
+alter table vendor_det add column PIN_CODE varchar(200) null;
+alter table vendor_det add column UID_NO varchar(200) null;
+alter table vendor_det add column PAN_NO varchar(200) null;
+
+alter table order_customer_map add column DUE_AMT double null;
+
+alter table order_customer_map add column TOTAL_AMT double null;
+
+alter table order_customer_map add column DISCOUNT double null;
+
+alter table order_customer_map add column PAYMENT_TYPE VARCHAR(200) null;
+
+alter table order_customer_map add column CHEQUE_NO VARCHAR(200) null;
+
+alter table order_customer_map add column GST_AMT double null;
+
+alter table order_customer_map add column ACC_NO varchar(200) null;
+
+
+alter table order_det add column BATCH_NO VARCHAR(200) null;
+
+alter table order_det add column RATE double null;
+
+alter table order_customer_map rename column CUSTOMET_ID to CUSTOMER_ID
+
+ALTER TABLE product_det CHANGE `RF2` `MRP` double null;
+ALTER TABLE product_det CHANGE `RF3` `MANUFACTURER` varchar(200) null;
+ALTER TABLE product_det CHANGE `RF4` `SELLING_PRICE` double null;
+ALTER TABLE product_det CHANGE `RF5` `PACKAGING` varchar(200) null;
 
 

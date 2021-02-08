@@ -35,14 +35,14 @@ public class CategoryService {
 		List<String> categoryNames = getCategoryNames();
 		for(CategoryDetailsBO catBO : categoryList){
 			if(categoryNames.contains(catBO.getCategoryName()))
-				return "Error in uploading categories. Duplicate for "+catBO.getCategoryName();
+				return "ERROE:Error in uploading categories. Duplicate for "+catBO.getCategoryName();
 			catBO.setCategoryId(++categoryId);
 		}
 		
 		int[] ret = insertCategory(categoryList);
 		if(ret.length<=0)
-			return "Error in uploading categories!!";
-		return "Categories uploaded successfully";
+			return "ERROE:Error in uploading categories!!";
+		return "SUCCESS:Categories uploaded successfully";
 	}
 
 	private int[] insertCategory(List<CategoryDetailsBO> categoryList) {
@@ -165,7 +165,7 @@ public class CategoryService {
 	}
 
 	public List<CategoryDetailsBO> getAllCategories() {
-		String query = "SELECT * FROM CATEGORY_DET";
+		String query = "SELECT * FROM category_det";
 		return jdbcTemplate.query(query, new ResultSetExtractor<List<CategoryDetailsBO>>() {
 			List<CategoryDetailsBO> categoryList = new ArrayList<>();
 			@Override

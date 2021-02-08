@@ -52,27 +52,27 @@ public class InventoryService {
 
 		int[] ret = insertProduct(productList);
 		if (ret.length <= 0)
-			return "Error in adding products Basic details!!";
+			return "ERROR:Error in adding products Basic details!!";
 		Date effDate = new Date();
 		ret = insertPoductStcokMap(productList,effDate);
 		if(ret.length<=0)
-			return "Error in adding Product stock map";
+			return "ERROR:Error in adding Product stock map";
 		ret = insertProductToCategoryMap(productList, catName2IdMap, effDate);
 		if (ret.length <= 0)
-			return "Error in adding products category!!";
+			return "ERROR:Error in adding products category!!";
 		ret = insertProdToSGSTMap(productList, effDate);
 		if (ret.length <= 0)
-			return "Error in adding products SGST details!!";
+			return "ERROR:Error in adding products SGST details!!";
 		ret = insertProdToCGSTMap(productList, effDate);
 		if (ret.length <= 0)
-			return "Error in adding products CGST details!!";
+			return "ERROR:Error in adding products CGST details!!";
 		ret = insertProdToIGSTMap(productList, effDate);
 		if (ret.length <= 0)
-			return "Error in adding products IGST details!!";
+			return "ERROR:Error in adding products IGST details!!";
 //		ret = insertProdToDiscountMap(productList, effDate);
 //		if (ret.length <= 0)
 //			return "Error in adding products discount details!!";
-		return "Products added successfully";
+		return "SUCCESS:Products added successfully";
 	}
 
 	private int[] insertPoductStcokMap(List<ProductDetailsBO> productList, Date effDate) {
@@ -100,17 +100,17 @@ public class InventoryService {
 		List<String> productNames = getProductNames();
 		Map<String, List<Double>> gst2RatesMap = populateGSTRates();
 		if (productNames.contains(prodBO.getProductName()))
-			return "Error in adding Product. Duplicate for " + prodBO.getProductName();
+			return "ERROR:Error in adding Product. Duplicate for " + prodBO.getProductName();
 		if (!catName2IdMap.containsKey(prodBO.getCategoryName()))
-			return "Error in adding Product. Invalid Category Name: " + prodBO.getCategoryName();
+			return "ERROR:Error in adding Product. Invalid Category Name: " + prodBO.getCategoryName();
 //		if (prodBO.getCgst() != 0 && !gst2RatesMap.get(Constants.CGST).contains(prodBO.getCgst()))
 //			return "Error in adding Product. Invalid CGST Rate: " + prodBO.getCgst();
 //		if (prodBO.getSgst() != 0 && !gst2RatesMap.get(Constants.SGST).contains(prodBO.getSgst()))
 //			return "Error in adding Product. Invalid SGST Rate: " + prodBO.getSgst();
 		if (prodBO.getGst() != 0 && !gst2RatesMap.get(Constants.GST).contains(prodBO.getGst()))
-			return "Error in adding Product. Invalid GST Rate: " + prodBO.getIgst();
+			return "ERROR:Error in adding Product. Invalid GST Rate: " + prodBO.getIgst();
 		if (prodBO.getUnit().equals(""))
-			return "Error in adding Product. Unit should not be blank";
+			return "ERROR:Error in adding Product. Unit should not be blank";
 		return null;
 	}
 
@@ -143,7 +143,7 @@ public class InventoryService {
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				ps.setInt(1, productList.get(i).getProductId());
-				ps.setDouble(2, productList.get(i).getGst()/2);
+				ps.setDouble(2, productList.get(i).getGst());
 				ps.setInt(3, DateUtils.dateSkey(effDate));
 				ps.setInt(4, DateUtils.dateSkey(Constants.MAX_DATE));
 				ps.setDate(5, new java.sql.Date(new Date().getTime()));
@@ -268,6 +268,30 @@ public class InventoryService {
 	public List<String> getProductNames() {
 		String query = "SELECT PRODUCT_NAME FROM PRODUCT_DET";
 		return jdbcTemplate.queryForList(query, String.class);
+	}
+	
+	public List<String> getBatchNos() {
+		String query = "SELECT DISTINCT(BATCH_NO) FROM PURCHASE_ORDER_DET WHERE"
+				+ " EXP_DATE>=? AND IN_STOCK>0";
+//		return jdbcTemplate.queryForList(query, String.class);
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setDate(1, new java.sql.Date(new Date().getTime()));
+				
+			}
+		}, new ResultSetExtractor<List<String>>() {
+
+			@Override
+			public List<String> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<String> retList = new ArrayList<>();
+				while(rs.next()){
+					retList.add(rs.getString(1));
+				}
+				return retList;
+			}
+		});
 	}
 
 	private int getMaxProductId() {
@@ -604,13 +628,47 @@ public class InventoryService {
 		Map<Integer,ProductDisplayDetailsBO> productId2DetMap = new HashMap<>();
 		populateProdutBasicDetails(productId2DetMap);
 		populateInventoyDetailsForproduct(productId2DetMap);
+		populateProdcutAvailStockMap(productId2DetMap);
+		populateProductGstMap(productId2DetMap);
 		return new ArrayList<>( productId2DetMap.values());
+	}
+
+	private void populateProductGstMap(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query = "SELECT PRODUCT_ID,GST_RATE FROM product_cgst_map";
+		jdbcTemplate.query(query, new ResultSetExtractor<Void>(){
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()){
+					productId2DetMap.get(rs.getInt(1)).setGst(rs.getDouble(2));
+				}
+				return null;
+			}
+			
+		});
+		
+	}
+
+	private void populateProdcutAvailStockMap(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM PRODUCT_STOCK_MAP";
+		jdbcTemplate.query(query, new ResultSetExtractor<Void>(){
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()){
+					productId2DetMap.get(rs.getInt(1)).setInStock(rs.getInt(2));
+				}
+				return null;
+			}
+			
+		});
+		
 	}
 
 	private void populateInventoyDetailsForproduct(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
 		String query =  "SELECT B.PRODUCT_ID, B.BATCH_NO,B.QUANTITY,B.PRICE,B.COST,B.GST,B.MFG_DATE,B.EXP_DATE,B.IN_STOCK \r\n" + 
 				"FROM product_det A, purchase_order_det B \r\n" + 
-				"WHERE A.PRODUCT_ID = B.PRODUCT_ID";
+				"WHERE A.PRODUCT_ID = B.PRODUCT_ID AND B.IN_STOCK>0";
 		jdbcTemplate.query(query, new ResultSetExtractor<Void>() {
 
 			@Override
@@ -633,7 +691,7 @@ public class InventoryService {
 						if(inventoryDetObj == null)
 							inventoryDetObj = new ArrayList<>();
 						inventoryDetObj.add(inventoryObj);
-						
+						prodDispObj.setInventories(inventoryDetObj);
 					}
 				}
 				return null;
@@ -709,7 +767,40 @@ public class InventoryService {
 			
 		});
 	}
+	
+	public ProductDetailsBO getProductObj(String batchNo){
+		String query = "SELECT B.PRODUCT_ID,B.EXP_DATE,A.PRODUCT_NAME,A.PACKAGING,A.SELLING_PRICE,"
+				+ "A.UNIT,A.MANUFACTURER,C.GST_RATE "
+				+ "FROM PRODUCT_DET A,PURCHASE_ORDER_DET B,PRODUCT_CGST_MAP C "
+				+ "WHERE A.PRODUCT_ID = B.PRODUCT_ID AND B.PRODUCT_ID=C.PRODUCT_ID AND "
+				+ "A.PRODUCT_ID=C.PRODUCT_ID AND B.BATCH_NO=?";
+		return jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				// TODO Auto-generated method stub
+				ps.setString(1, batchNo);
+			}
+		}, new ResultSetExtractor<ProductDetailsBO>() {
 
+			@Override
+			public ProductDetailsBO extractData(ResultSet rs) throws SQLException, DataAccessException {
+				ProductDetailsBO prodBO = new ProductDetailsBO();
+				while(rs.next()){
+					prodBO.setProductId(rs.getInt(1));
+					prodBO.setExpDate(new Date(rs.getDate(2).getTime()));
+					prodBO.setProductName(rs.getString(3));
+					prodBO.setPackaging(rs.getString(4));
+					prodBO.setSellingPrice(rs.getDouble(5));
+					prodBO.setUnit(rs.getString(6));
+					prodBO.setManufacturer(rs.getString(7));
+					prodBO.setGst(rs.getDouble(8));
+				}
+				return prodBO;
+			}
+		});
+	}
+	
 	public int[] updateProductStockMap(Map<Integer, Integer> product2AvailStockM) {
 		String query = "UPDATE PRODUCT_STOCK_MAP SET AVAIL_STOCK=?,LAST_UPDATE_TIME=?,LAST_USER=? "+
 						" WHERE PRODUCT_ID=?";
@@ -768,6 +859,53 @@ public class InventoryService {
 		}
 		retString+=")";
 		return retString;
+	}
+
+	public Map<String, Integer> getBatchNoAvailStockMap(List<ProductDetailsBO> productsList) {
+		String query="SELECT BATCH_NO,IN_STOCK FROM PURCHASE_ORDER_DET "+
+				" WHERE BATCH_NO IN"+getInClause(productsList.size());
+		return jdbcTemplate.query(query, new PreparedStatementSetter(){
+	
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				for(int i=1;i<=productsList.size();i++){
+					ps.setString(i, productsList.get(i-1).getBatchNo());
+				}
+				
+			}
+			
+		}, new ResultSetExtractor<Map<String,Integer>>() {
+	
+			@Override
+			public Map<String, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				Map<String, Integer> prod2AvailStockM = new HashMap<>();
+				while(rs.next()){
+					prod2AvailStockM.put(rs.getString(1), rs.getInt(2));
+				}
+				return prod2AvailStockM;
+			}
+		});
+	}
+
+	public int[] updateBatchStockMap(Map<String, Integer> product2AvailStockM) {
+		String query = "UPDATE PURCHASE_ORDER_DET SET IN_STOCK=?"+
+				" WHERE BATCH_NO=?";
+
+		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
+			List<String>prodIdList = new ArrayList<>(product2AvailStockM.keySet());
+			
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setInt(1, product2AvailStockM.get(prodIdList.get(i)));
+				ps.setString(2, prodIdList.get(i));
+			}
+			
+			@Override
+			public int getBatchSize() {
+				// TODO Auto-generated method stub
+				return product2AvailStockM.size();
+			}
+		});
 	}
 
 }

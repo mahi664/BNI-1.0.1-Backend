@@ -25,13 +25,13 @@ public class VendorService {
 	private JdbcTemplate jdbcTemplate;
 	
 	public String addNewVendor(VendorDetailsBO vendorDetBO) {
-		//TODO: 1. Check Vendor is existing. 2. Fetch next vendor Id to use.
+		//TODO: 1. Check Vendor is existing.
 		int vendorId = getMaxVendorId();
 		vendorDetBO.setVendorId(++vendorId);
 		int ret = insertVendorDets(vendorDetBO);
 		if(ret==1)
-			return "Vendor Details Added Successfully!!";
-		return "Error in adding Vendor details!!";
+			return "SUCCESS:Vendor Details Added Successfully!!";
+		return "ERROR:Error in adding Vendor details!!";
 	}
 
 	private int getMaxVendorId() {

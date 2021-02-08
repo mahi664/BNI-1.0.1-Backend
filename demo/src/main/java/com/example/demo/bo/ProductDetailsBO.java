@@ -150,10 +150,21 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	@Override
 	public String toString() {
 		return "ProductDetailsBO [productId=" + productId + ", productName=" + productName + ", displayName="
-				+ displayName + ", description=" + description + ", cost=" + cost + ", price=" + sellingPrice + ", discount="
-				+ discount + ", quantity=" + quantity + ", cgst=" + cgst + ", sgst=" + sgst + ", igst=" + igst
-				+ ", gst=" + gst + ", unit=" + unit + ", batchNo=" + batchNo + ", mfgDate=" + mfgDate + ", expDate="
-				+ expDate + "]";
+				+ displayName + ", description=" + description + ", cost=" + cost + ", sellingPrice=" + sellingPrice
+				+ ", discount=" + discount + ", quantity=" + quantity + ", cgst=" + cgst + ", sgst=" + sgst + ", igst="
+				+ igst + ", gst=" + gst + ", unit=" + unit + ", batchNo=" + batchNo + ", mfgDate=" + mfgDate
+				+ ", expDate=" + expDate + ", mrp=" + mrp + ", manufacturer=" + manufacturer + ", packaging="
+				+ packaging + ", total=" + total + ", getTotal()=" + getTotal() + ", getSellingPrice()="
+				+ getSellingPrice() + ", getMrp()=" + getMrp() + ", getManufacturer()=" + getManufacturer()
+				+ ", getPackaging()=" + getPackaging() + ", getBatchNo()=" + getBatchNo() + ", getProductId()="
+				+ getProductId() + ", getProductName()=" + getProductName() + ", getDisplayName()=" + getDisplayName()
+				+ ", getDescription()=" + getDescription() + ", getCost()=" + getCost() + ", getDiscount()="
+				+ getDiscount() + ", getQuantity()=" + getQuantity() + ", getCgst()=" + getCgst() + ", getSgst()="
+				+ getSgst() + ", getIgst()=" + getIgst() + ", getUnit()=" + getUnit() + ", getMfgDate()=" + getMfgDate()
+				+ ", getExpDate()=" + getExpDate() + ", getGst()=" + getGst() + ", getCategoryId()=" + getCategoryId()
+				+ ", getCategoryName()=" + getCategoryName() + ", getCategoryDispName()=" + getCategoryDispName()
+				+ ", getCategoryDescription()=" + getCategoryDescription() + ", toString()=" + super.toString()
+				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + "]";
 	}
 	
 	

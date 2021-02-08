@@ -1,6 +1,5 @@
 package com.example.demo.controllers;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,25 +9,21 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.example.demo.bo.GstDetailsBO;
 import com.example.demo.bo.ProductDisplayDetailsBO;
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.services.InventoryService;
-import com.example.demo.storage.StorageService;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 public class InventoryController {
 	
 	@Autowired
 	InventoryService inventoryService;
 	
-	@Autowired
-	StorageService storageService;
+//	@Autowired
+//	StorageService storageService;
 	
 	@PostMapping(path="/add-new-product")
 	public String addNewProduct(@RequestBody ProductDetailsBO pBO){
@@ -37,11 +32,11 @@ public class InventoryController {
 		return inventoryService.addNewProduct(productList);
 	}
 	
-	@PostMapping(path="/add-new-products")
-	public String addNewProducts(@RequestParam MultipartFile fileName) throws FileNotFoundException{
-		storageService.store(fileName);
-		return inventoryService.addNewProducts(fileName.getOriginalFilename());
-	}
+//	@PostMapping(path="/add-new-products")
+//	public String addNewProducts(@RequestParam MultipartFile fileName) throws FileNotFoundException{
+//		storageService.store(fileName);
+//		return inventoryService.addNewProducts(fileName.getOriginalFilename());
+//	}
 	
 	@PostMapping(path="/update-products")
 	public String updateProducts(@RequestBody List<ProductDetailsBO> productList){
@@ -69,6 +64,11 @@ public class InventoryController {
 		return inventoryService.getProductNames();
 	}
 	
+	@GetMapping(path="/get-batch-numbers")
+	public List<String> getBatchNos(){
+		return inventoryService.getBatchNos();
+	}
+	
 	@GetMapping(path="/get-product-gst-map")
 	public Map<String, Double> getProductGstMap(){
 		return inventoryService.getProductGstMap();
@@ -77,5 +77,10 @@ public class InventoryController {
 	@GetMapping(path="/get-product-name-id-map")
 	public Map<String, Integer> getProductToIdMap(){
 		return inventoryService.getProductToIdMap();
+	}
+	
+	@PostMapping(path="/get-product-obj")
+	public ProductDetailsBO getProductObj(@RequestBody String batchNo){
+		return inventoryService.getProductObj(batchNo);
 	}
 }

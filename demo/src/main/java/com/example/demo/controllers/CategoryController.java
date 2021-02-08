@@ -17,14 +17,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.bo.CategoryDetailsBO;
 import com.example.demo.services.CategoryService;
-import com.example.demo.storage.StorageService;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 public class CategoryController {
 
-	@Autowired
-	StorageService storageService;
+//	@Autowired
+//	StorageService storageService;
 	
 	@Autowired
 	CategoryService categoryService;
@@ -44,7 +43,7 @@ public class CategoryController {
 	
 	@PostMapping(path="/add-new-categories")
 	public String addNewCategories(@RequestParam MultipartFile fileName) throws FileNotFoundException{
-		storageService.store(fileName);
+//		storageService.store(fileName);
 		return categoryService.addNewCategories(fileName.getOriginalFilename());
 	}
 	

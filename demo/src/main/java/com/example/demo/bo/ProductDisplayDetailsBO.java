@@ -12,9 +12,25 @@ public class ProductDisplayDetailsBO {
 	private double sellingPrice;
 	private String manufacturer;
 	private String packaging;
+	private int    inStock;
+	private double gst;
 	
 	private List<InventoryBO> inventories = null;
 	
+	
+	
+	public double getGst() {
+		return gst;
+	}
+	public void setGst(double gst) {
+		this.gst = gst;
+	}
+	public int getInStock() {
+		return inStock;
+	}
+	public void setInStock(int inStock) {
+		this.inStock = inStock;
+	}
 	public double getMrp() {
 		return mrp;
 	}

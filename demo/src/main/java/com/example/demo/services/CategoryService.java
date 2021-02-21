@@ -46,7 +46,7 @@ public class CategoryService {
 	}
 
 	private int[] insertCategory(List<CategoryDetailsBO> categoryList) {
-		String query = "INSERT INTO CATEGORY_DET(CATEGORY_ID,NAME,DISP_NAME,CATEGORY_DESC)"+ 
+		String query = "INSERT INTO category_det(CATEGORY_ID,NAME,DISP_NAME,CATEGORY_DESC)"+ 
 				   "VALUES(?,?,?,?)";
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 			
@@ -66,7 +66,7 @@ public class CategoryService {
 	}
 
 	private int getMaxCatId() {
-		String query = "SELECT MAX(CATEGORY_ID) FROM CATEGORY_DET";
+		String query = "SELECT MAX(CATEGORY_ID) FROM category_det";
 		Integer catId =  jdbcTemplate.queryForObject(query, Integer.class);
 		if(catId==null)
 			return 0;
@@ -74,7 +74,7 @@ public class CategoryService {
 	}
 	
 	public List<String> getCategoryNames() {
-		String query = "SELECT NAME FROM CATEGORY_DET";
+		String query = "SELECT NAME FROM category_det";
 		return jdbcTemplate.queryForList(query, String.class);
 	}
 
@@ -115,7 +115,7 @@ public class CategoryService {
 	}
 
 	private String getUpdateQuery(CategoryDetailsBO catBO) {
-		String query = "UPDATE CATEGORY_DET SET ";
+		String query = "UPDATE category_det SET ";
 		if(catBO.getCategoryName()!=null)
 			query+="NAME=?";
 		if(catBO.getCategoryDispName()!=null){
@@ -130,7 +130,7 @@ public class CategoryService {
 	}
 
 	public String deleteCategories(List<Integer> categoryIds) {
-		String query = "DELETE FROM CATEGORY_DET WHERE CATEGORY_ID=?";
+		String query = "DELETE FROM category_det WHERE CATEGORY_ID=?";
 		int[] ret = jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 			
 			@Override
@@ -149,7 +149,7 @@ public class CategoryService {
 	}
 
 	public Map<String, String> getCategoryIdToNameMap() {
-		String query = "SELECT CATEGORY_ID,NAME FROM CATEGORY_DET";
+		String query = "SELECT CATEGORY_ID,NAME FROM category_det";
 		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, String>>(){
 
 			@Override
@@ -184,7 +184,7 @@ public class CategoryService {
 	}
 
 	public List<CategoryDetailsBO> getQuickSearchedCategory(String filterParam) {
-		String query = "SELECT * FROM CATEGORY_DET "+
+		String query = "SELECT * FROM category_det "+
 						"WHERE CATEGORY_ID LIKE CONCAT('%',?,'%') OR NAME LIKE CONCAT('%',?,'%') OR DISP_NAME LIKE CONCAT('%',?,'%') OR CATEGORY_DESC LIKE CONCAT('%',?,'%')";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
 			

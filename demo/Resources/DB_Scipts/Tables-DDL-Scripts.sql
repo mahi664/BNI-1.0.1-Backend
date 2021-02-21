@@ -360,4 +360,13 @@ ALTER TABLE product_det CHANGE `RF3` `MANUFACTURER` varchar(200) null;
 ALTER TABLE product_det CHANGE `RF4` `SELLING_PRICE` double null;
 ALTER TABLE product_det CHANGE `RF5` `PACKAGING` varchar(200) null;
 
+create table alerts(
+	ALERT_ID int not null,
+	ALERT_NAME varchar(1000) not null,
+	ALERT_TYPE char not null,
+	ALERT_DISCRIPTION varchar(500) not null,
+	
+	primary key(ALERT_ID)
+);
+
 

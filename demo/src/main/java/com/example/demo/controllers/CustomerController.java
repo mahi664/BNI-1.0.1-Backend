@@ -13,7 +13,7 @@ import com.example.demo.bo.CustomerDetailsBO;
 import com.example.demo.bo.VendorDetailsBO;
 import com.example.demo.services.CustomerDataService;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController(value="/customer")
 public class CustomerController {
 	
@@ -33,5 +33,10 @@ public class CustomerController {
 	@GetMapping(path="get-customer-list")
 	public List<CustomerDetailsBO> getVendorList(){
 		return customerDataService.getCustomerList();
+	}
+	
+	@GetMapping(path="/get-customer-details")
+	public List<CustomerDetailsBO> getVendorDetails(){
+		return customerDataService.getCustomerDetails();
 	}
 }

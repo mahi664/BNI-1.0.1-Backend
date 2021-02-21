@@ -11,6 +11,14 @@ public class InventoryBO {
 	private Date mfgDate;
 	private Date expDate;
 	private double inStock;
+	private String expStatus;
+	
+	public String getExpStatus() {
+		return expStatus;
+	}
+	public void setExpStatus(String expStatus) {
+		this.expStatus = expStatus;
+	}
 	public String getBatchNo() {
 		return batchNo;
 	}

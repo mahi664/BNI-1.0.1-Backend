@@ -76,7 +76,7 @@ public class InventoryService {
 	}
 
 	private int[] insertPoductStcokMap(List<ProductDetailsBO> productList, Date effDate) {
-		String query = "INSERT INTO PRODUCT_STOCK_MAP(PRODUCT_ID,AVAIL_STOCK,LAST_UPDATE_TIME,LAST_USER) "+
+		String query = "INSERT INTO product_stock_map(PRODUCT_ID,AVAIL_STOCK,LAST_UPDATE_TIME,LAST_USER) "+
 						"VALUES(?,?,?,?)";
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 			
@@ -115,7 +115,7 @@ public class InventoryService {
 	}
 
 	private int[] insertProdToSGSTMap(List<ProductDetailsBO> productList, Date effDate) {
-		String query = "INSERT INTO PRODUCT_SGST_MAP (PRODUCT_ID,GST_RATE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME) "+
+		String query = "INSERT INTO product_sgst_map (PRODUCT_ID,GST_RATE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME) "+
 						Constants.VALUESFORINSERT;
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 
@@ -136,7 +136,7 @@ public class InventoryService {
 	}
 	
 	private int[] insertProdToCGSTMap(List<ProductDetailsBO> productList, Date effDate) {
-		String query = "INSERT INTO PRODUCT_CGST_MAP (PRODUCT_ID,GST_RATE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME) "+
+		String query = "INSERT INTO product_cgst_map (PRODUCT_ID,GST_RATE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME) "+
 						Constants.VALUESFORINSERT;
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 
@@ -157,7 +157,7 @@ public class InventoryService {
 	}
 
 	private int[] insertProdToIGSTMap(List<ProductDetailsBO> productList, Date effDate) {
-		String query = "INSERT INTO PRODUCT_IGST_MAP (PRODUCT_ID,GST_RATE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME) "+
+		String query = "INSERT INTO product_igst_map (PRODUCT_ID,GST_RATE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME) "+
 						Constants.VALUESFORINSERT;
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 
@@ -178,7 +178,7 @@ public class InventoryService {
 	}
 	
 	private int[] insertProdToDiscountMap(List<ProductDetailsBO> productList, Date effDate) {
-		String query = "INSERT INTO PRODUCT_DISCOUNT_MAP(PRODUCT_ID,DISCOUNT,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
+		String query = "INSERT INTO product_discount_map(PRODUCT_ID,DISCOUNT,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
 				+ Constants.VALUESFORINSERT;
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 
@@ -202,7 +202,7 @@ public class InventoryService {
 	private Map<String, List<Double>> populateGSTRates() {
 		Map<String, List<Double>> gstRatesMap = new HashMap<>();
 
-		String query = "SELECT GST_RATE FROM GST_RATES";
+		String query = "SELECT GST_RATE FROM gst_rates";
 		List<Double> list = jdbcTemplate.queryForList(query, Double.class);
 		gstRatesMap.put(Constants.GST, list);
 
@@ -219,7 +219,7 @@ public class InventoryService {
 
 	private int[] insertProductToCategoryMap(List<ProductDetailsBO> productList, Map<String, String> catName2IdMap,
 			Date effDate) {
-		String query = "INSERT INTO PRODUCT_CATEGORY_MAP(PRODUCT_ID,CATEGORY_ID,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
+		String query = "INSERT INTO product_category_map(PRODUCT_ID,CATEGORY_ID,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
 				+ Constants.VALUESFORINSERT;
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 
@@ -240,7 +240,7 @@ public class InventoryService {
 	}
 
 	private int[] insertProduct(List<ProductDetailsBO> productList) {
-		String query = "INSERT INTO PRODUCT_DET(PRODUCT_ID,PRODUCT_NAME,DISP_NAME,PRODUCT_DESC,UNIT,"
+		String query = "INSERT INTO product_det(PRODUCT_ID,PRODUCT_NAME,DISP_NAME,PRODUCT_DESC,UNIT,"
 				+ "MRP,MANUFACTURER,SELLING_PRICE,PACKAGING)"
 				+ "VALUES(?,?,?,?,?,?,?,?,?)";
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
@@ -266,12 +266,12 @@ public class InventoryService {
 	}
 
 	public List<String> getProductNames() {
-		String query = "SELECT PRODUCT_NAME FROM PRODUCT_DET";
+		String query = "SELECT PRODUCT_NAME FROM product_det";
 		return jdbcTemplate.queryForList(query, String.class);
 	}
 	
 	public List<String> getBatchNos() {
-		String query = "SELECT DISTINCT(BATCH_NO) FROM PURCHASE_ORDER_DET WHERE"
+		String query = "SELECT DISTINCT(BATCH_NO) FROM purchase_order_det WHERE"
 				+ " EXP_DATE>=? AND IN_STOCK>0";
 //		return jdbcTemplate.queryForList(query, String.class);
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
@@ -295,7 +295,7 @@ public class InventoryService {
 	}
 
 	private int getMaxProductId() {
-		String query = "SELECT MAX(PRODUCT_ID) FROM PRODUCT_DET";
+		String query = "SELECT MAX(PRODUCT_ID) FROM product_det";
 		String catId = jdbcTemplate.queryForObject(query, String.class);
 		if (catId == null)
 			return 0;
@@ -366,7 +366,7 @@ public class InventoryService {
 	}
 
 	private int updateProductDiscount(int productId) {
-		String query="UPDATE PRODUCT_DISCOUNT_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
+		String query="UPDATE product_discount_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
@@ -381,7 +381,7 @@ public class InventoryService {
 	}
 
 	private int updateProductCGSTMap(int productId) {
-		String query="UPDATE PRODUCT_CGST_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
+		String query="UPDATE product_cgst_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
@@ -396,7 +396,7 @@ public class InventoryService {
 	}
 	
 	private int updateProductSGSTMap(int productId) {
-		String query="UPDATE PRODUCT_SGST_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
+		String query="UPDATE product_sgst_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
@@ -411,7 +411,7 @@ public class InventoryService {
 	}
 	
 	private int updateProductIGSTMap(int productId) {
-		String query="UPDATE PRODUCT_IGST_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
+		String query="UPDATE product_igst_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=?";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 			
@@ -426,7 +426,7 @@ public class InventoryService {
 	}
 
 	private int insetProductCost(ProductDetailsBO prodBO) {
-		String query = "INSERT INTO PRODUCT_COST_MAP(PRODUCT_ID,COST,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
+		String query = "INSERT INTO product_cost_map(PRODUCT_ID,COST,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
 				+ Constants.VALUESFORINSERT;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 
@@ -443,7 +443,7 @@ public class InventoryService {
 	}
 
 	private int updateProductCost(int productId) {
-		String query = "UPDATE PRODUCT_COST_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=? ";
+		String query = "UPDATE product_cost_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=? ";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 
@@ -459,7 +459,7 @@ public class InventoryService {
 	}
 
 	private int insertProductPrice(ProductDetailsBO prodBO) {
-		String query = "INSERT INTO PRODUCT_PRICE_MAP(PRODUCT_ID,PRICE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
+		String query = "INSERT INTO product_price_map(PRODUCT_ID,PRICE,EFF_DATE_SKEY,END_DATE_SKEY,LAST_UPDATE_TIME)"
 				+ Constants.VALUESFORINSERT;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 
@@ -476,7 +476,7 @@ public class InventoryService {
 	}
 
 	private int updateProductPrice(int productId) {
-		String query = "UPDATE PRODUCT_PRICE_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=? ";
+		String query = "UPDATE product_price_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=? ";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 
@@ -492,7 +492,7 @@ public class InventoryService {
 	}
 
 	private int updateProductCategory(int productId) {
-		String query = "UPDATE PRODUCT_CATEGORY_MAP SET END_DATE_SKEY=?,LAST_UPDATE_TIME=? ";
+		String query = "UPDATE product_category_map SET END_DATE_SKEY=?,LAST_UPDATE_TIME=? ";
 		query+=Constants.PIDANDENDDATEWHERECLAUSE;
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 
@@ -537,7 +537,7 @@ public class InventoryService {
 	}
 
 	private String getUpdateStatementForProdBaseDet(ProductDetailsBO prodBO) {
-		String query = "UPDATE PRODUCT_DET SET ";
+		String query = "UPDATE product_det SET ";
 		if (prodBO.getProductName() != null)
 			query += "PRODUCT_NAME=?";
 		if (prodBO.getDisplayName() != null) {
@@ -592,7 +592,7 @@ public class InventoryService {
 	}
 
 	private int insertGstRates(GstDetailsBO gstDet) {
-		String query = "INSERT INTO GST_RATES (GST_RATE,NAME) VALUES(?,?)";
+		String query = "INSERT INTO gst_rates (GST_RATE,NAME) VALUES(?,?)";
 		
 		return jdbcTemplate.update(query, new PreparedStatementSetter() {
 
@@ -607,7 +607,7 @@ public class InventoryService {
 	}
 
 	public List<GstDetailsBO> getGstRates() {
-		String query = "SELECT NAME,GST_RATE FROM GST_RATES";
+		String query = "SELECT NAME,GST_RATE FROM gst_rates";
 		return jdbcTemplate.query(query, new ResultSetExtractor<List<GstDetailsBO>>() {
 			List<GstDetailsBO> retList = new ArrayList<>();
 			@Override
@@ -650,7 +650,7 @@ public class InventoryService {
 	}
 
 	private void populateProdcutAvailStockMap(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
-		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM PRODUCT_STOCK_MAP";
+		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM product_stock_map";
 		jdbcTemplate.query(query, new ResultSetExtractor<Void>(){
 
 			@Override
@@ -687,6 +687,7 @@ public class InventoryService {
 						inventoryObj.setMfgDate(rs.getDate(7));
 						inventoryObj.setExpDate(rs.getDate(8));
 						inventoryObj.setInStock(rs.getDouble(9));
+						setExpiryStatus(inventoryObj);
 						List<InventoryBO> inventoryDetObj = prodDispObj.getInventories();
 						if(inventoryDetObj == null)
 							inventoryDetObj = new ArrayList<>();
@@ -698,6 +699,20 @@ public class InventoryService {
 			}
 			
 		});
+	}
+	
+	private void setExpiryStatus(InventoryBO inventoryObj) {
+		Date currDate = new Date();
+		int diff = DateUtils.dateSkey(inventoryObj.getExpDate()) - DateUtils.dateSkey(currDate);
+		if(diff<0){
+			inventoryObj.setExpStatus(Constants.EXPIRED);
+		}
+		else if(diff<=30){
+			inventoryObj.setExpStatus(Constants.ABOUT_TO_EXPIRE);
+		}
+		else{
+			inventoryObj.setExpStatus(Constants.EMPTY_STRING);
+		}
 	}
 
 	private void populateProdutBasicDetails(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
@@ -771,7 +786,7 @@ public class InventoryService {
 	public ProductDetailsBO getProductObj(String batchNo){
 		String query = "SELECT B.PRODUCT_ID,B.EXP_DATE,A.PRODUCT_NAME,A.PACKAGING,A.SELLING_PRICE,"
 				+ "A.UNIT,A.MANUFACTURER,C.GST_RATE "
-				+ "FROM PRODUCT_DET A,PURCHASE_ORDER_DET B,PRODUCT_CGST_MAP C "
+				+ "FROM product_det A,purchase_order_det B,product_cgst_map C "
 				+ "WHERE A.PRODUCT_ID = B.PRODUCT_ID AND B.PRODUCT_ID=C.PRODUCT_ID AND "
 				+ "A.PRODUCT_ID=C.PRODUCT_ID AND B.BATCH_NO=?";
 		return jdbcTemplate.query(query, new PreparedStatementSetter() {
@@ -802,7 +817,7 @@ public class InventoryService {
 	}
 	
 	public int[] updateProductStockMap(Map<Integer, Integer> product2AvailStockM) {
-		String query = "UPDATE PRODUCT_STOCK_MAP SET AVAIL_STOCK=?,LAST_UPDATE_TIME=?,LAST_USER=? "+
+		String query = "UPDATE product_stock_map SET AVAIL_STOCK=?,LAST_UPDATE_TIME=?,LAST_USER=? "+
 						" WHERE PRODUCT_ID=?";
 		
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
@@ -825,7 +840,7 @@ public class InventoryService {
 	}
 
 	public Map<Integer, Integer> getProductAvailStockMap(List<ProductDetailsBO> productsList) {
-		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM PRODUCT_STOCK_MAP "+
+		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM product_stock_map "+
 					" WHERE PRODUCT_ID IN"+getInClause(productsList.size());
 		return jdbcTemplate.query(query, new PreparedStatementSetter(){
 
@@ -862,7 +877,7 @@ public class InventoryService {
 	}
 
 	public Map<String, Integer> getBatchNoAvailStockMap(List<ProductDetailsBO> productsList) {
-		String query="SELECT BATCH_NO,IN_STOCK FROM PURCHASE_ORDER_DET "+
+		String query="SELECT BATCH_NO,IN_STOCK FROM purchase_order_det "+
 				" WHERE BATCH_NO IN"+getInClause(productsList.size());
 		return jdbcTemplate.query(query, new PreparedStatementSetter(){
 	
@@ -888,7 +903,7 @@ public class InventoryService {
 	}
 
 	public int[] updateBatchStockMap(Map<String, Integer> product2AvailStockM) {
-		String query = "UPDATE PURCHASE_ORDER_DET SET IN_STOCK=?"+
+		String query = "UPDATE purchase_order_det SET IN_STOCK=?"+
 				" WHERE BATCH_NO=?";
 
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {

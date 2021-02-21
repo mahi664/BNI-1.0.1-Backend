@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.bo.PurchaseDetailsBO;
 import com.example.demo.bo.VendorDetailsBO;
+import com.example.demo.utils.DateUtils;
 
 @Service
 public class VendorService {
@@ -35,7 +36,7 @@ public class VendorService {
 	}
 
 	private int getMaxVendorId() {
-		String query = "SELECT MAX(VENDOR_ID) FROM VENDOR_DET";
+		String query = "SELECT MAX(VENDOR_ID) FROM vendor_det";
 		String vendorId = jdbcTemplate.queryForObject(query, String.class);
 		if (vendorId == null)
 			return 0;
@@ -43,7 +44,7 @@ public class VendorService {
 	}
 
 	private int insertVendorDets(VendorDetailsBO vendorDetBO) {
-		String query = "INSERT INTO VENDOR_DET (VENDOR_ID,VENDOR_NAME,CITY,DISTRICT,STATE,PHONE,"+
+		String query = "INSERT INTO vendor_det (VENDOR_ID,VENDOR_NAME,CITY,DISTRICT,STATE,PHONE,"+
 						"EMAIL,GST_NO,UID_NO,VILLAGE,PIN_CODE,PAN_NO) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 		return jdbcTemplate.update(query, new PreparedStatementSetter(){
 
@@ -85,8 +86,9 @@ public class VendorService {
 					PurchaseDetailsBO purchaseOrdBO = new PurchaseDetailsBO();
 					purchaseOrdBO.setInvoiceId(rs.getString(1));
 					purchaseOrdBO.setInvoiceDateSkey(rs.getInt(3));
-					purchaseOrdBO.setTotalAmt(rs.getDouble(4));
-					purchaseOrdBO.setDueAmt(rs.getDouble(5));
+					purchaseOrdBO.setInvoiceDate(DateUtils.getDate(purchaseOrdBO.getInvoiceDateSkey()));
+					purchaseOrdBO.setDueAmt(rs.getDouble(4));
+					purchaseOrdBO.setTotalAmt(rs.getDouble(5));
 					purchaseOrdBO.setPaidAmt(purchaseOrdBO.getTotalAmt()-purchaseOrdBO.getDueAmt());
 					
 					List<PurchaseDetailsBO> purchaseOrdeL = vendorId2VendorDetM.get(rs.getInt(2)).getInvoices();
@@ -94,6 +96,7 @@ public class VendorService {
 						purchaseOrdeL = new ArrayList<>();
 					purchaseOrdeL.add(purchaseOrdBO);
 					vendorId2VendorDetM.get(rs.getInt(2)).setInvoices(purchaseOrdeL);
+					vendorId2VendorDetM.get(rs.getInt(2)).setTotalDueAmt(vendorId2VendorDetM.get(rs.getInt(2)).getTotalDueAmt()+purchaseOrdBO.getDueAmt());
 				}
 				return null;
 			}
@@ -135,7 +138,7 @@ public class VendorService {
 	}
 
 	public List<VendorDetailsBO> getVendorList() {
-		String query = "SELECT VENDOR_ID,VENDOR_NAME FROM VENDOR_DET";
+		String query = "SELECT VENDOR_ID,VENDOR_NAME FROM vendor_det";
 		return jdbcTemplate.query(query, new ResultSetExtractor<List<VendorDetailsBO>>(){
 
 			@Override

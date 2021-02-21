@@ -16,12 +16,22 @@ public class CustomerDetailsBO {
 	private 	String 						uidNo;
 	private 	String 						gstNo;
 	private 	String 						panNo;
+	private 	double						totalDueAmt = 0;
 	
 	//List of Invoices belongs to this Customer
-	private 	ArrayList<InvoiceDetailsBO>	invoices =	null;
+	private 	List<InvoiceDetailsBO>	invoices =	null;
 	
 	
 	
+	
+	public double getTotalDueAmt() {
+		return totalDueAmt;
+	}
+
+	public void setTotalDueAmt(double totalDueAmt) {
+		this.totalDueAmt = totalDueAmt;
+	}
+
 	public String getVillage() {
 		return village;
 	}
@@ -122,11 +132,11 @@ public class CustomerDetailsBO {
 		this.email = email;
 	}
 
-	public ArrayList<InvoiceDetailsBO> getInvoices() {
+	public List<InvoiceDetailsBO> getInvoices() {
 		return invoices;
 	}
 
-	public void setInvoices(ArrayList<InvoiceDetailsBO> invoices) {
+	public void setInvoices(List<InvoiceDetailsBO> invoices) {
 		this.invoices = invoices;
 	}
 

@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.bo.ProductDetailsBO;
 import com.example.demo.bo.PurchaseDetailsBO;
 import com.example.demo.bo.VendorDetailsBO;
+import com.example.demo.utils.Constants;
 import com.example.demo.utils.DateUtils;
 
 @Service
@@ -32,27 +32,33 @@ public class PurchaseOrderService {
 	
 	@Autowired
 	private InventoryService inventoryService;
+	
+	@Autowired
+	private AlertsService alertsService;
 
+	
 	@Transactional
 	public String addNewPurchaseOrder(VendorDetailsBO vendorDetBO) {
-//		try {
-			int ret = insertVendorReceipt(vendorDetBO.getVendorId(), vendorDetBO.getInvoices().get(0));
-			if(ret<=0){
-				return "Error in saving new purchase order!";
-			}
-			int batRet[] = insertPurchaseOrderDetails(vendorDetBO.getInvoices().get(0).getInvoiceId(),vendorDetBO.getInvoices().get(0).getProductsList()); 
-			if(batRet.length<=0)
-				return "Error in saving new purchase order!";
-			Map<Integer, Integer> product2AvailStockM = inventoryService.getProductAvailStockMap(vendorDetBO.getInvoices().get(0).getProductsList());
-			updateProdToAvailStock(product2AvailStockM,vendorDetBO.getInvoices().get(0).getProductsList());
-			batRet = inventoryService.updateProductStockMap(product2AvailStockM);
-			return "New purchase order saved successfully!";
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			
-//			return "Error in saving new purchase order!";
-//		}
-		
+		int ret = insertVendorReceipt(vendorDetBO.getVendorId(), vendorDetBO.getInvoices().get(0));
+		if (ret <= 0) {
+			return alertsService.getAlert(Constants.ALERTS_TYPE.ERROR.toString(),
+					Constants.ALERTS.VEN_RECPT_MAP_ERROR.toString());
+		}
+		int batRet[] = insertPurchaseOrderDetails(vendorDetBO.getInvoices().get(0).getInvoiceId(),
+				vendorDetBO.getInvoices().get(0).getProductsList());
+		if (batRet.length <= 0)
+			return alertsService.getAlert(Constants.ALERTS_TYPE.ERROR.toString(),
+					Constants.ALERTS.PUR_ORDR_ERROR.toString());
+		Map<Integer, Integer> product2AvailStockM = inventoryService
+				.getProductAvailStockMap(vendorDetBO.getInvoices().get(0).getProductsList());
+		updateProdToAvailStock(product2AvailStockM, vendorDetBO.getInvoices().get(0).getProductsList());
+		batRet = inventoryService.updateProductStockMap(product2AvailStockM);
+		if (batRet.length <= 0)
+			return alertsService.getAlert(Constants.ALERTS_TYPE.ERROR.toString(),
+					Constants.ALERTS.PROD_STOCK_MAP_UPDATE_ERROR.toString());
+		return alertsService.getAlert(Constants.ALERTS_TYPE.SUCCESS.toString(),
+				Constants.ALERTS.PUR_ORDR_SUCCESS.toString());
+
 	}
 
 	private void updateProdToAvailStock(Map<Integer, Integer> product2AvailStockM,List<ProductDetailsBO> productsList) {
@@ -66,7 +72,7 @@ public class PurchaseOrderService {
 	}
 
 	private int[] insertPurchaseOrderDetails(String invoiceId, List<ProductDetailsBO> productsList) {
-		String query="INSERT INTO PURCHASE_ORDER_DET(PRODUCT_ID,INVOICE_ID,BATCH_NO,QUANTITY,COST,GST,EXP_DATE,IN_STOCK) "+
+		String query="INSERT INTO purchase_order_det(PRODUCT_ID,INVOICE_ID,BATCH_NO,QUANTITY,COST,GST,EXP_DATE,IN_STOCK) "+
 				" VALUES(?,?,?,?,?,?,?,?)";
 		return jdbcTemplate.batchUpdate(query, new BatchPreparedStatementSetter() {
 			
@@ -84,7 +90,6 @@ public class PurchaseOrderService {
 			
 			@Override
 			public int getBatchSize() {
-				// TODO Auto-generated method stub
 				return productsList.size();
 			}
 		});
@@ -93,7 +98,7 @@ public class PurchaseOrderService {
 
 
 	private int insertVendorReceipt(int vendorId, PurchaseDetailsBO purchaseDetailsBO) {
-		String query = "INSERT INTO VENDOR_RECEIPT_MAP (VENDOR_ID,INVOICE_ID,DATE_SKEY,DUE_AMT,TOTAL_AMT,DISCOUNT,PAYMENT_TYPE,CHEQUE_NO,GST_AMT,ACC_NO) "+
+		String query = "INSERT INTO vendor_receipt_map (VENDOR_ID,INVOICE_ID,DATE_SKEY,DUE_AMT,TOTAL_AMT,DISCOUNT,PAYMENT_TYPE,CHEQUE_NO,GST_AMT,ACC_NO) "+
 						"VALUES(?,?,?,?,?,?,?,?,?,?)";
 		return jdbcTemplate.update(query, new PreparedStatementSetter(){
 
@@ -102,7 +107,7 @@ public class PurchaseOrderService {
 				ps.setInt(1, vendorId);
 				ps.setString(2, purchaseDetailsBO.getInvoiceId());
 				ps.setInt(3, DateUtils.dateSkey(purchaseDetailsBO.getInvoiceDate()));
-				ps.setDouble(4, purchaseDetailsBO.getDueAmt());
+				ps.setDouble(4, purchaseDetailsBO.getTotalAmt()-purchaseDetailsBO.getPaidAmt());
 				ps.setDouble(5, purchaseDetailsBO.getTotalAmt());
 				ps.setDouble(6, purchaseDetailsBO.getDiscount());
 				ps.setString(7, purchaseDetailsBO.getPaymentType());

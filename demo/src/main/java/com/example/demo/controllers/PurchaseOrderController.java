@@ -13,7 +13,7 @@ import com.example.demo.bo.PurchaseDetailsBO;
 import com.example.demo.bo.VendorDetailsBO;
 import com.example.demo.services.PurchaseOrderService;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 public class PurchaseOrderController {
 	

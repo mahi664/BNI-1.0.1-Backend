@@ -16,12 +16,19 @@ public class VendorDetailsBO {
 	private 	String 		village;
 	private 	String 		pinCode;
 	private 	String 		panNo;
+	private		double		totalDueAmt = 0;
 	
 	private 	List<PurchaseDetailsBO> invoices = null;
 	
 	
 	
 	
+	public double getTotalDueAmt() {
+		return totalDueAmt;
+	}
+	public void setTotalDueAmt(double totalDueAmt) {
+		this.totalDueAmt = totalDueAmt;
+	}
 	public List<PurchaseDetailsBO> getInvoices() {
 		return invoices;
 	}

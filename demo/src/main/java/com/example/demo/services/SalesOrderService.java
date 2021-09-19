@@ -217,8 +217,9 @@ public class SalesOrderService {
 	}
 
 	public int getNextInvoiceId() {
-		String query = "select max(ORDER_ID) from order_customer_map";
-		return jdbcTemplate.queryForObject(query, Integer.class);
+		String query = "select max(ORDER_ID)+1 from order_customer_map";
+		int invoiceId =  jdbcTemplate.queryForObject(query, Integer.class) == null ? 1 : jdbcTemplate.queryForObject(query, Integer.class);
+		return invoiceId;
 	}
 
 }

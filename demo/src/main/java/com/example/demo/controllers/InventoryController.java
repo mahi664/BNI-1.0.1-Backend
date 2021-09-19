@@ -59,6 +59,11 @@ public class InventoryController {
 		return inventoryService.getInventoryDetails();
 	}
 	
+	@PostMapping(path="/quick-search-inventory")
+	public List<ProductDisplayDetailsBO> getCategoriesOnQuickSearch(@RequestBody String filterParam){
+		return inventoryService.getQuickSearchedInventory(filterParam);
+	}
+	
 	@GetMapping(path="/get-product-names")
 	public List<String> getProductNames(){
 		return inventoryService.getProductNames();

@@ -785,7 +785,7 @@ public class InventoryService {
 	
 	public ProductDetailsBO getProductObj(String batchNo){
 		String query = "SELECT B.PRODUCT_ID,B.EXP_DATE,A.PRODUCT_NAME,A.PACKAGING,A.SELLING_PRICE,"
-				+ "A.UNIT,A.MANUFACTURER,C.GST_RATE "
+				+ "A.UNIT,A.MANUFACTURER,C.GST_RATE,,B.IN_STOCK "
 				+ "FROM product_det A,purchase_order_det B,product_cgst_map C "
 				+ "WHERE A.PRODUCT_ID = B.PRODUCT_ID AND B.PRODUCT_ID=C.PRODUCT_ID AND "
 				+ "A.PRODUCT_ID=C.PRODUCT_ID AND B.BATCH_NO=?";
@@ -810,6 +810,7 @@ public class InventoryService {
 					prodBO.setUnit(rs.getString(6));
 					prodBO.setManufacturer(rs.getString(7));
 					prodBO.setGst(rs.getDouble(8));
+					prodBO.setInStock(rs.getDouble(9));
 				}
 				return prodBO;
 			}
@@ -922,5 +923,145 @@ public class InventoryService {
 			}
 		});
 	}
+	
+	public List<ProductDisplayDetailsBO> getQuickSearchedInventory(String filterParam) {
+		Map<Integer,ProductDisplayDetailsBO> productId2DetMap = new HashMap<>();
+		populateProdutBasicDetailsOnQuickSearch(productId2DetMap,filterParam);
+		populateInventoyDetailsForproductOnQuickSearch(productId2DetMap);
+		populateProdcutAvailStockMapOnQuickSearch(productId2DetMap);
+		populateProductGstMapOnQuickSearch(productId2DetMap);
+		return new ArrayList<>( productId2DetMap.values());
+	}
 
+	private void populateProductGstMapOnQuickSearch(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query = "SELECT PRODUCT_ID,GST_RATE FROM product_cgst_map where PRODUCT_ID IN"+getInClause(productId2DetMap.size());
+		
+		jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				List<Integer> keys = new ArrayList<>(productId2DetMap.keySet());
+				for(int i=1;i<=keys.size();i++){
+					ps.setInt(i, keys.get(i-1));
+				}
+			}
+		}, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()){
+					productId2DetMap.get(rs.getInt(1)).setGst(rs.getDouble(2));
+				}
+				return null;
+			}
+		});
+	}
+
+	private void populateProdcutAvailStockMapOnQuickSearch(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query="SELECT PRODUCT_ID,AVAIL_STOCK FROM product_stock_map where PRODUCT_ID IN"+getInClause(productId2DetMap.size());
+		jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				List<Integer> keys = new ArrayList<>(productId2DetMap.keySet());
+				for(int i=1;i<=keys.size();i++){
+					ps.setInt(i, keys.get(i-1));
+				}
+			}
+		}, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()){
+					productId2DetMap.get(rs.getInt(1)).setInStock(rs.getInt(2));
+				}
+				return null;
+			}
+		});
+	}
+
+	private void populateInventoyDetailsForproductOnQuickSearch(Map<Integer, ProductDisplayDetailsBO> productId2DetMap) {
+		String query =  "SELECT B.PRODUCT_ID, B.BATCH_NO,B.QUANTITY,B.PRICE,B.COST,B.GST,B.MFG_DATE,B.EXP_DATE,B.IN_STOCK \r\n" + 
+				"FROM product_det A, purchase_order_det B \r\n" + 
+				"WHERE A.PRODUCT_ID = B.PRODUCT_ID AND B.IN_STOCK>0 AND A.PRODUCT_ID IN"+getInClause(productId2DetMap.size());
+		
+		jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				List<Integer> keys = new ArrayList<>(productId2DetMap.keySet());
+				for(int i=1;i<=keys.size();i++){
+					ps.setInt(i, keys.get(i-1));
+				}
+			}
+		}, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					if(!productId2DetMap.containsKey(rs.getInt(1)))
+						continue;
+					ProductDisplayDetailsBO prodDispObj = productId2DetMap.get(rs.getInt(1));
+					if(prodDispObj!=null) {
+						InventoryBO inventoryObj = new InventoryBO();
+						inventoryObj.setBatchNo(rs.getString(2));
+						inventoryObj.setTotalQty(rs.getDouble(3));
+						inventoryObj.setSellingPrice(rs.getDouble(4));
+						inventoryObj.setPurchasedCost(rs.getDouble(5));
+						inventoryObj.setGst(rs.getDouble(6));
+						inventoryObj.setMfgDate(rs.getDate(7));
+						inventoryObj.setExpDate(rs.getDate(8));
+						inventoryObj.setInStock(rs.getDouble(9));
+						setExpiryStatus(inventoryObj);
+						List<InventoryBO> inventoryDetObj = prodDispObj.getInventories();
+						if(inventoryDetObj == null)
+							inventoryDetObj = new ArrayList<>();
+						inventoryDetObj.add(inventoryObj);
+						prodDispObj.setInventories(inventoryDetObj);
+					}
+				}
+				return null;
+			}
+		});
+		
+	}
+
+	private void populateProdutBasicDetailsOnQuickSearch(Map<Integer, ProductDisplayDetailsBO> productId2DetMap, String filterParam) {
+		String query = "SELECT A.PRODUCT_ID,A.PRODUCT_NAME,A.PRODUCT_DESC,A.UNIT,A.MRP,"
+				+ "A.MANUFACTURER, A.SELLING_PRICE, A.PACKAGING,B.NAME\r\n" + 
+				"FROM product_det A, category_det B, product_category_map C\r\n" + 
+				"WHERE A.PRODUCT_ID = C.PRODUCT_ID AND B.CATEGORY_ID = C.CATEGORY_ID AND A.PRODUCT_NAME LIKE CONCAT('%',?,'%')";
+		
+		jdbcTemplate.query(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, filterParam);
+				
+			}
+		}, new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException, DataAccessException {
+				while(rs.next()) {
+					int productId = rs.getInt(1);
+					if(!productId2DetMap.containsKey(productId)) {
+						productId2DetMap.put(productId,new ProductDisplayDetailsBO());
+					}
+					
+					ProductDisplayDetailsBO prodDispDet = productId2DetMap.get(productId);
+					prodDispDet.setProductId(productId);
+					prodDispDet.setProductName(rs.getString(2));
+					prodDispDet.setDescription(rs.getString(3));
+					prodDispDet.setUnit(rs.getString(4));
+					prodDispDet.setMrp(rs.getDouble(5));
+					prodDispDet.setManufacturer(rs.getString(6));
+					prodDispDet.setSellingPrice(rs.getDouble(7));
+					prodDispDet.setPackaging(rs.getString(8));
+					prodDispDet.setCategory(rs.getString(9));
+				}
+				return null;
+			}
+		});
+	}
 }

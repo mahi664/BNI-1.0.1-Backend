@@ -369,4 +369,30 @@ create table alerts(
 	primary key(ALERT_ID)
 );
 
+ALTER TABLE order_customer_map CHANGE `CUSTOMET_ID` `CUSTOMER_ID` int NOT NULL;
+
+delete from alerts where `ALERT_ID` = 1;
+INSERT INTO alerts
+(`ALERT_ID`, `ALERT_NAME`, `ALERT_TYPE`, `ALERT_DISCRIPTION`)
+VALUES(1, 'PUR_ORDR_SUCCESS', 'S', 'Purchase Order Addedd Successfully');
+
+delete from alerts where `ALERT_ID` = 2;
+INSERT INTO alerts
+(`ALERT_ID`, `ALERT_NAME`, `ALERT_TYPE`, `ALERT_DISCRIPTION`)
+VALUES(2, 'PUR_ORDR_ERROR', 'E', 'Error in adding Purchase Order');
+
+delete from alerts where `ALERT_ID` = 3;
+INSERT INTO alerts
+(`ALERT_ID`, `ALERT_NAME`, `ALERT_TYPE`, `ALERT_DISCRIPTION`)
+VALUES(3, 'VEN_RECPT_MAP_ERROR', 'E', 'Error in adding vendor receipt map');
+
+delete from alerts where `ALERT_ID` = 4;
+INSERT INTO bni.alerts
+(`ALERT_ID`, `ALERT_NAME`, `ALERT_TYPE`, `ALERT_DISCRIPTION`)
+VALUES(4, 'PROD_STOCK_MAP_UPDATE_ERROR', 'E', 'Error in updating product stock map');
+
+ALTER TABLE order_det CHANGE `RF1` `GST` double null;
+
+ALTER TABLE order_det CHANGE `RF2` `EXP_DATE` datetime null;
+
 

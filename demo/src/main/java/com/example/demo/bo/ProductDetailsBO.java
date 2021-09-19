@@ -23,10 +23,15 @@ public class ProductDetailsBO extends CategoryDetailsBO {
 	private 	String 		manufacturer;
 	private 	String 		packaging;
 	private 	double 		total;
+	private 	double 		inStock;
 	
 	
-	
-	
+	public double getInStock() {
+		return inStock;
+	}
+	public void setInStock(double inStock) {
+		this.inStock = inStock;
+	}
 	public double getTotal() {
 		return total;
 	}

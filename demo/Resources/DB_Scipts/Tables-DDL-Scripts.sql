@@ -1,3 +1,4 @@
+--dummy commit
 DROP TABLE purchase_order_det;
 DROP TABLE vendor_receipt_map;
 DROP TABLE vendor_det;
